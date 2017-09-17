@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xy.mapper.UserCoinRecordMapper">
+  <resultMap id="BaseResultMap" type="com.xy.models.UserCoinRecord">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="uuid" jdbcType="CHAR" property="uuid" />
+    <result column="user_uuid" jdbcType="CHAR" property="userUuid" />
+    <result column="coin" jdbcType="INTEGER" property="coin" />
+    <result column="type" jdbcType="CHAR" property="type" />
+    <result column="left_coin" jdbcType="REAL" property="leftCoin" />
+    <result column="remarks" jdbcType="VARCHAR" property="remarks" />
+    <result column="add_time" jdbcType="VARCHAR" property="addTime" />
+    <result column="detail_type" jdbcType="CHAR" property="detailType" />
+  </resultMap>
+</mapper>

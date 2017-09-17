@@ -1,0 +1,51 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<script src="assets/scripts/sea.js" ></script>
+<script>
+		seajs.config({
+		  alias: {
+              "jquery": "/xyshop-supplier/assets/base/jquery.min",
+              "jqueryUtils": "/xyshop-supplier/assets/scripts/utils/jqueryUtils",
+              "localStageUtils": "/xyshop-supplier/assets/scripts/utils/localStageUtils",
+              "bootstrap": "/xyshop-supplier/assets/base/bootstrap",
+              "table": "/xyshop-supplier/assets/base/plugins/bootstrap-table/bootstrap-table",
+              "locale": "/xyshop-supplier/assets/base/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min",
+              "export": "/xyshop-supplier/assets/base/plugins/bootstrap-table/extensions/export/bootstrap-table-export",
+              "bootstrapedit": "/xyshop-supplier/assets/base/plugins/bootstrap-table/extensions/editable/bootstrap-editable",
+              "tableedit": "/xyshop-supplier/assets/base/plugins/bootstrap-table/extensions/editable/bootstrap-table-editable",
+              "upload": "/xyshop-supplier/assets/base/plugins/webuploader/webuploader.min",
+              "tableUtils": "/xyshop-supplier/assets/scripts/utils/bootstrapTableUtils",
+              "uploadUtils": "/xyshop-supplier/assets/scripts/utils/uploadUtils",
+              "alertUtils": "/xyshop-supplier/assets/scripts/utils/alertUtils",
+              "validateUtils": "/xyshop-supplier/assets/scripts/utils/validateUtils",
+              "common": "/xyshop-supplier/assets/scripts/utils/common",
+              "load": "/xyshop-supplier/assets/scripts/utils/superUse",
+              "icheck": "/xyshop-supplier/assets/base/plugins/iCheck/icheck.min",
+              "sweet": "/xyshop-supplier/assets/base/plugins/sweetalert/sweetalert.min",
+              "validate": "/xyshop-supplier/assets/base/plugins/validate/jquery.validate.min.js",
+              "messages_zh": "/xyshop-supplier/assets/base/plugins/validate/messages_zh.min.js",
+              "ueditor": "/xyshop-supplier/assets/base/plugins/ueditor/ueditor.all.min.js",
+              "ueconfig": "/xyshop-supplier/assets/base/plugins/ueditor/ueditor.config.js",
+              "laydate": "/xyshop-supplier/assets/base/plugins/layer/laydate/laydate.js",
+              "contabs": "/xyshop-supplier/assets/base/contabsiframs.js",
+              "imgsUtils": "/xyshop-supplier/assets/scripts/utils/imgsShowUtils.js",
+              "imgTip": "/xyshop-supplier/assets/base/plugins/imgtooptip/ToolTip.js",
+              "time": "/xyshop-supplier/assets/scripts/utils/timeUtils.js",
+              "echarts": "/xyshop-supplier/assets/base/plugins/echarts/echarts-all.js",
+              "echartsUtils": "/xyshop-supplier/assets/scripts/utils/echartsUtils.js",
+              "laydateUtils": "/xyshop-supplier/assets/scripts/utils/laydateUtils.js",
+              "metisMenu": "/xyshop-supplier/assets/base/plugins/metisMenu/jquery.metisMenu.js",
+              "slimscroll": "/xyshop-supplier/assets/base/plugins/slimscroll/jquery.slimscroll.min.js",
+              "layer": "/xyshop-supplier/assets/base/plugins/layer/layer.min.js",
+              "hplus": "/xyshop-supplier/assets/base/hplus.min.js",
+              "contabs_index": "/xyshop-supplier/assets/base/contabs.min.js",
+              "pace": "/xyshop-supplier/assets/base/plugins/pace/pace.min.js",
+              "printarea": "/xyshop-supplier/assets/base/plugins/printarea/jquery.printarea.js",
+              "ztree": "/xyshop-supplier/assets/base/plugins/zTree_v3/js/jquery.ztree.all.min.js",
+              "utils": "/xyshop-supplier/assets/scripts/utils/utils.js",
+              "tableexport": "/xyshop-supplier/assets/base/plugins/bootstrap-table/extensions/export/tableExport",
+              "AMap": "http://webapi.amap.com/maps?v=1.3&key=4d2305dc2bee0fc8cdf3c4640ebe9bce"
+		  },
+		  charset: 'utf-8',
+		  preload: ["jquery","bootstrap","table"]
+		});
+</script>

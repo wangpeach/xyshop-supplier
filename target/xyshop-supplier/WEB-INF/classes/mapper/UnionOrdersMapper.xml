@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xy.mapper.UnionOrdersMapper">
+  <resultMap id="BaseResultMap" type="com.xy.models.UnionOrders">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="uuid" jdbcType="CHAR" property="uuid" />
+    <result column="user_uuid" jdbcType="CHAR" property="userUuid" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="shop_uuid" jdbcType="CHAR" property="shopUuid" />
+    <result column="shop_name" jdbcType="VARCHAR" property="shopName" />
+    <result column="order_no" jdbcType="VARCHAR" property="orderNo" />
+    <result column="total_price" jdbcType="DECIMAL" property="totalPrice" />
+    <result column="pay_price" jdbcType="DECIMAL" property="payPrice" />
+    <result column="pay_way" jdbcType="CHAR" property="payWay" />
+    <result column="status" jdbcType="CHAR" property="status" />
+    <result column="add_time" jdbcType="VARCHAR" property="addTime" />
+    <result column="goods_uuid" jdbcType="VARCHAR" property="goodsUuid" />
+    <result column="goods_num" jdbcType="INTEGER" property="goodsNum" />
+    <result column="judged" jdbcType="BIT" property="judged" />
+    <result column="card_code" jdbcType="VARCHAR" property="cardCode" />
+    <result column="coupon" jdbcType="VARCHAR" property="coupon" />
+    <result column="preferential_price" jdbcType="DECIMAL" property="preferentialPrice" />
+  </resultMap>
+</mapper>

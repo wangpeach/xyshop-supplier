@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xy.mapper.UnionGoodsMapper">
+  <resultMap id="BaseResultMap" type="com.xy.models.UnionGoods">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="uuid" jdbcType="CHAR" property="uuid" />
+    <result column="shop_uuid" jdbcType="CHAR" property="shopUuid" />
+    <result column="brand_id" jdbcType="VARCHAR" property="brandId" />
+    <result column="cat_id" jdbcType="VARCHAR" property="catId" />
+    <result column="cat_name" jdbcType="VARCHAR" property="catName" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="thumb_img" jdbcType="VARCHAR" property="thumbImg" />
+    <result column="more_img" jdbcType="VARCHAR" property="moreImg" />
+    <result column="des_file" jdbcType="VARCHAR" property="desFile" />
+    <result column="sale_num" jdbcType="INTEGER" property="saleNum" />
+    <result column="if_online" jdbcType="INTEGER" property="ifOnline" />
+    <result column="if_coin" jdbcType="INTEGER" property="ifCoin" />
+    <result column="add_time" jdbcType="VARCHAR" property="addTime" />
+    <result column="update_time" jdbcType="VARCHAR" property="updateTime" />
+    <result column="shop_name" jdbcType="VARCHAR" property="shopName" />
+    <result column="give_coin" jdbcType="INTEGER" property="giveCoin" />
+    <result column="price" jdbcType="REAL" property="price" />
+    <result column="balance" jdbcType="REAL" property="balance" />
+    <result column="stock" jdbcType="INTEGER" property="stock" />
+    <result column="rebut" jdbcType="VARCHAR" property="rebut" />
+  </resultMap>
+</mapper>
