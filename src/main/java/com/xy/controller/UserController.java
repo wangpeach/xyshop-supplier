@@ -1,7 +1,10 @@
 package com.xy.controller;
 
+import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.PageInfo;
 import com.xy.models.Ad;
 import com.xy.models.User;
+import com.xy.pojo.ParamsPojo;
 import com.xy.services.IAdService;
 import com.xy.services.IUserService;
 import com.xy.utils.DateUtils;
@@ -20,7 +23,7 @@ import java.util.Map;
  */
 @Scope("prototype")
 @Controller
-@RequestMapping("user/mapi/")
+@RequestMapping("user/")
 public class UserController {
 
     @Autowired
@@ -30,7 +33,7 @@ public class UserController {
     private IAdService adService;
 
     @ResponseBody
-    @RequestMapping(value = "/login")
+    @RequestMapping(value = "mapi/login")
     public User exec(@ModelAttribute User user) {
         if(StringUtils.isNotNull(user.getPhoneNum()) && StringUtils.isNotNull(user.getPassword())) {
             user.setPassword(Md5Util.md5UpperCase(user.getPassword()));
@@ -39,7 +42,7 @@ public class UserController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/register")
+    @RequestMapping(value = "mapi/register")
     public Map<String, Object> login(@ModelAttribute User user) {
         Map<String, Object> result = new HashMap<>();
 
@@ -64,7 +67,7 @@ public class UserController {
     }
 
     @ResponseBody
-    @RequestMapping("reload")
+    @RequestMapping("mapi/reload")
     public User reload(@RequestParam String uuid) {
         return userService.selectOnlyByKey(uuid);
     }
@@ -74,7 +77,7 @@ public class UserController {
      * @return
      */
     @ResponseBody
-    @RequestMapping("coin-reward")
+    @RequestMapping("mapi/coin-reward")
     public ResJsonVo coinReward(@RequestParam String user, @RequestParam String ad) {
         ResJsonVo jsonVo = new ResJsonVo();
         User m_user = userService.selectOnlyByKey(user);
@@ -89,5 +92,16 @@ public class UserController {
             jsonVo.setParaCheckFail();
         }
         return jsonVo;
+    }
+
+
+
+
+    @ResponseBody
+    @RequestMapping("list")
+    public PageInfo<User> pageList(@RequestBody JSONObject jsonObject) {
+        ParamsPojo pj = new ParamsPojo(jsonObject);
+        userService.selectPageListByParams(pj);
+        return null;
     }
 }
