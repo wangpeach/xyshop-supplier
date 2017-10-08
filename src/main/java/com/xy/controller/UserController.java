@@ -95,8 +95,11 @@ public class UserController {
     }
 
 
-
-
+    /**
+     * 用户列表
+     * @param jsonObject
+     * @return
+     */
     @ResponseBody
     @RequestMapping("list")
     public PageInfo<User> pageList(@RequestBody JSONObject jsonObject) {

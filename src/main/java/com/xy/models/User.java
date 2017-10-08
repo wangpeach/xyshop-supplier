@@ -143,6 +143,8 @@ public class User {
      */
     private Integer sceneid;
 
+    private String status;
+
     /**
      * @return uuid
      */
@@ -587,5 +589,13 @@ public class User {
      */
     public void setSceneid(Integer sceneid) {
         this.sceneid = sceneid;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

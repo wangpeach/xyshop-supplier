@@ -30,5 +30,6 @@
     <result column="address_detail" jdbcType="VARCHAR" property="addressDetail" />
     <result column="openid" jdbcType="VARCHAR" property="openid" />
     <result column="sceneid" jdbcType="INTEGER" property="sceneid" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
   </resultMap>
 </mapper>
