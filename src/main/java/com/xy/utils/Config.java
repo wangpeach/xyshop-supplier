@@ -17,7 +17,7 @@ public class Config implements EnvironmentAware {
     private Environment env;
 
 
-    public static String WX_APPID = "";
+    public static String WX_APPID = " ";
 
 
     public static String ali_appid = "2016082000294577";
