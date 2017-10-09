@@ -22,10 +22,13 @@ public class UserService extends BaseService<User> implements IUserService {
         if(StringUtils.isNotNull(pj.getSearch())) {
             String[] cols = {"name", "phoneNum"};
             String condition = "%s like ", arg = "'%"+ pj.getSearch() +"%'";
+
             for (int i = 0; i < cols.length; i++) {
                 cols[i] = String.format(condition, StringUtil.camelhumpToUnderline(cols[i])) + arg;
             }
+
             String or = org.apache.commons.lang3.StringUtils.join(cols, " or ");
+
             cri.andCondition("("+ or +")");
         }
 
@@ -37,10 +40,6 @@ public class UserService extends BaseService<User> implements IUserService {
 
     @Override
     public PageInfo<User> selectPageListByParams(ParamsPojo pj) {
-
-        this.createCond(pj);
-
-//        super.selectPageInfoByCondition();
-        return null;
+        return super.selectPageInfoByCondition(this.createCond(pj), pj.getStart(), pj.getLength());
     }
 }

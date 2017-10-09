@@ -31,6 +31,25 @@ public class FileController {
     private Redis redis;
 
     /**
+     * 上传 base64 图片
+     * @param base64Code
+     * @return
+     */
+    @RequestMapping("upload/exec")
+    public @ResponseBody Map<String, Object> exec(@RequestParam("base64code") String base64Code) {
+        Map<String, Object> resMap = new HashMap<>();
+        String fileName = StringUtils.getUuid();
+        boolean res = FileUtils.ImageUtil.generateImage(base64Code, Config.FILETEMP, fileName, "png");
+        if(res) {
+            resMap.put("status", "success");
+            resMap.put("url", Config.REQTEMP + fileName + ".png");
+        } else {
+            resMap.put("status", "error");
+        }
+        return resMap;
+    }
+
+    /**
      * 上传图片
      *
      * @param file

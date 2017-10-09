@@ -104,7 +104,6 @@ public class UserController {
     @RequestMapping("list")
     public PageInfo<User> pageList(@RequestBody JSONObject jsonObject) {
         ParamsPojo pj = new ParamsPojo(jsonObject);
-        userService.selectPageListByParams(pj);
-        return null;
+        return userService.selectPageListByParams(pj);
     }
 }

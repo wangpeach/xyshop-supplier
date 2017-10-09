@@ -458,7 +458,7 @@ public class FileUtils {
          * @param imgStr      Base64字符串
          * @param imgFilePath 生成图片保存路径
          */
-        public static void generateImage(String imgStr, String imgFilePath, String fileName, String fileType) {
+        public static boolean generateImage(String imgStr, String imgFilePath, String fileName, String fileType) {
             BASE64Decoder decoder = new BASE64Decoder();
             try {
                 File dir = new File(imgFilePath);
@@ -475,8 +475,11 @@ public class FileUtils {
                 out.write(bytes);
                 out.flush();
                 out.close();
+                return true;
             } catch (IOException e) {
-                e.printStackTrace();
+//                e.printStackTrace();
+                System.out.println(e.toString());
+                return false;
             }
         }
 
