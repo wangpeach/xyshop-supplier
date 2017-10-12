@@ -7,9 +7,7 @@ import com.xy.models.User;
 import com.xy.pojo.ParamsPojo;
 import com.xy.services.IAdService;
 import com.xy.services.IUserService;
-import com.xy.utils.DateUtils;
-import com.xy.utils.Md5Util;
-import com.xy.utils.StringUtils;
+import com.xy.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -71,6 +69,35 @@ public class UserController {
     public User reload(@RequestParam String uuid) {
         return userService.selectOnlyByKey(uuid);
     }
+
+
+    /**
+     * 上传头像
+     * @param base64
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("mapi/upload-head")
+    public Map<String, Object> uploadHead(@RequestParam String base64, @RequestParam String userId) {
+        Map<String, Object> resMap = new HashMap<>();
+        String fileName = StringUtils.getUuid();
+        boolean res = FileUtils.ImageUtil.generateImage(base64, Config.HEADPATH, fileName, "png");
+        if(res) {
+            User user = new User();
+            user.setUuid(userId);
+            user.setHeadImg(fileName + ".png");
+            if(userService.updateByPrimaryKeySelective(user) > 0) {
+                resMap.put("status", "success");
+                resMap.put("url", Config.HEADURL + fileName + ".png");
+            } else {
+                resMap.put("status", "error:101");
+            }
+        } else {
+            resMap.put("status", "error:102");
+        }
+        return resMap;
+    }
+
 
     /**
      * 金币奖励

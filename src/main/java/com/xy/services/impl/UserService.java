@@ -4,11 +4,14 @@ import com.github.pagehelper.PageInfo;
 import com.xy.models.User;
 import com.xy.pojo.ParamsPojo;
 import com.xy.services.IUserService;
+import com.xy.utils.Config;
 import com.xy.utils.StringUtils;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Condition;
 import tk.mybatis.mapper.entity.Example;
 import tk.mybatis.mapper.util.StringUtil;
+
+import java.util.List;
 
 /**
  * Created by rjora on 2017/6/29 0029.
@@ -39,7 +42,33 @@ public class UserService extends BaseService<User> implements IUserService {
     }
 
     @Override
+    public User selectOnlyByKey(Object key) {
+        return this.handleResult(super.selectOnlyByKey(key));
+    }
+
+    @Override
+    public User selectOnly(User entity) {
+        return this.handleResult(super.selectOnly(entity));
+    }
+
+    @Override
     public PageInfo<User> selectPageListByParams(ParamsPojo pj) {
         return super.selectPageInfoByCondition(this.createCond(pj), pj.getStart(), pj.getLength());
+    }
+
+    @Override
+    public List<User> handleResult(List<User> args) {
+        args.forEach(s -> {
+            if(StringUtils.isNotNull(s.getHeadImg())) {
+                s = this.handleResult(s);
+            }
+        });
+        return args;
+    }
+
+    @Override
+    public User handleResult(User arg) {
+        arg.setHeadImg(Config.HEADURL + arg.getHeadImg());
+        return arg;
     }
 }
