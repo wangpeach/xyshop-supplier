@@ -56,6 +56,11 @@ public class UserService extends BaseService<User> implements IUserService {
         return super.selectPageInfoByCondition(this.createCond(pj), pj.getStart(), pj.getLength());
     }
 
+    /**
+     * 处理用户头像
+     * @param args
+     * @return
+     */
     @Override
     public List<User> handleResult(List<User> args) {
         args.forEach(s -> {

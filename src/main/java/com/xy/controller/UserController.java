@@ -72,7 +72,7 @@ public class UserController {
 
 
     /**
-     * 上传头像
+     * 上传头像，base64
      * @param base64
      * @return
      */
