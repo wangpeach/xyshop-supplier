@@ -35,8 +35,8 @@ public class FileController {
      * @param base64Code
      * @return
      */
-    @RequestMapping("upload/exec")
-    public @ResponseBody Map<String, Object> exec(@RequestParam("base64code") String base64Code) {
+    @RequestMapping("upload/base64")
+    public @ResponseBody Map<String, Object> base64(@RequestParam("base64code") String base64Code) {
         Map<String, Object> resMap = new HashMap<>();
         String fileName = StringUtils.getUuid();
         boolean res = FileUtils.ImageUtil.generateImage(base64Code, Config.FILETEMP, fileName, "png");
