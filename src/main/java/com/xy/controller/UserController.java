@@ -33,7 +33,7 @@ public class UserController {
     @ResponseBody
     @RequestMapping(value = "mapi/login")
     public User exec(@ModelAttribute User user) {
-        if(StringUtils.isNotNull(user.getPhoneNum()) && StringUtils.isNotNull(user.getPassword())) {
+        if (StringUtils.isNotNull(user.getPhoneNum()) && StringUtils.isNotNull(user.getPassword())) {
             user.setPassword(Md5Util.md5UpperCase(user.getPassword()));
         }
         return userService.selectOnly(user);
@@ -46,11 +46,11 @@ public class UserController {
 
         User other = new User();
         other.setPhoneNum(user.getPhoneNum());
-        if(userService.count(user) == 0) {
+        if (userService.count(user) == 0) {
             user.setUuid(StringUtils.getUuid());
             user.setPassword(Md5Util.md5UpperCase(user.getPassword()));
             user.setAddTime(DateUtils.getCurrentDate());
-            if(userService.saveSelective(user) > 0) {
+            if (userService.saveSelective(user) > 0) {
                 result.put("status", true);
                 result.put("msg", "注册成功");
             } else {
@@ -73,6 +73,7 @@ public class UserController {
 
     /**
      * 上传头像，base64
+     *
      * @param base64
      * @return
      */
@@ -82,11 +83,11 @@ public class UserController {
         Map<String, Object> resMap = new HashMap<>();
         String fileName = StringUtils.getUuid();
         boolean res = FileUtils.ImageUtil.generateImage(base64, Config.HEADPATH, fileName, "png");
-        if(res) {
+        if (res) {
             User user = new User();
             user.setUuid(userId);
             user.setHeadImg(fileName + ".png");
-            if(userService.updateByPrimaryKeySelective(user) > 0) {
+            if (userService.updateByPrimaryKeySelective(user) > 0) {
                 resMap.put("status", "success");
                 resMap.put("url", Config.HEADURL + fileName + ".png");
             } else {
@@ -101,6 +102,7 @@ public class UserController {
 
     /**
      * 金币奖励
+     *
      * @return
      */
     @ResponseBody
@@ -109,8 +111,8 @@ public class UserController {
         ResJsonVo jsonVo = new ResJsonVo();
         User m_user = userService.selectOnlyByKey(user);
         Ad m_ad = adService.selectOnlyByKey(ad);
-        if(m_ad != null && user != null) {
-            if(StringUtils.isNotNull(m_ad.getCoin())) {
+        if (m_ad != null && user != null) {
+            if (StringUtils.isNotNull(m_ad.getCoin())) {
                 m_user.setCoin(m_user.getCoin().add(m_ad.getCoin()));
                 userService.updateByPrimaryKeySelective(m_user);
                 jsonVo.setData(m_user.getCoin());
@@ -124,6 +126,7 @@ public class UserController {
 
     /**
      * 用户列表
+     *
      * @param jsonObject
      * @return
      */
@@ -132,5 +135,14 @@ public class UserController {
     public PageInfo<User> pageList(@RequestBody JSONObject jsonObject) {
         ParamsPojo pj = new ParamsPojo(jsonObject);
         return userService.selectPageListByParams(pj);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = {"update", "mapi/update"})
+    public String update(@ModelAttribute User user) {
+        if (userService.updateByPrimaryKeySelective(user) > 0) {
+            return "success";
+        }
+        return "error";
     }
 }
