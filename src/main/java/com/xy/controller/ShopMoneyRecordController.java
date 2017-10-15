@@ -1,6 +1,6 @@
 package com.xy.controller;
 
-import com.xy.services.IShopMoneyRecordService;
+import com.xy.services.ShopMoneyRecordService;
 import com.xy.utils.MoneyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -17,7 +17,7 @@ import java.util.Map;
 public class ShopMoneyRecordController {
 
     @Autowired
-    private IShopMoneyRecordService moneyRecordService;
+    private ShopMoneyRecordService moneyRecordService;
 
     /**
      * 商铺消费统计

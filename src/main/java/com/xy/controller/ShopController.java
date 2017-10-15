@@ -7,10 +7,10 @@ import com.xy.models.Shop;
 import com.xy.models.ShopUpdateWallet;
 import com.xy.models.ShopWallet;
 import com.xy.pojo.ParamsPojo;
-import com.xy.services.ILogService;
-import com.xy.services.IShopService;
-import com.xy.services.IShopUpdateWalletService;
-import com.xy.services.IShopWalletService;
+import com.xy.services.LogService;
+import com.xy.services.ShopService;
+import com.xy.services.ShopUpdateWalletService;
+import com.xy.services.ShopWalletService;
 import com.xy.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.ModelMap;
@@ -33,13 +33,13 @@ import java.util.*;
 public class ShopController {
 
     @Autowired
-    private IShopService shopService;
+    private ShopService shopService;
     @Autowired
-    private IShopUpdateWalletService shopUpdateWalletService;
+    private ShopUpdateWalletService shopUpdateWalletService;
     @Autowired
-    private IShopWalletService shopWalletService;
+    private ShopWalletService shopWalletService;
     @Autowired
-    private ILogService logService;
+    private LogService logService;
 
 
     /**

@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import com.xy.models.ShopCategory;
 import com.xy.pojo.ParamsPojo;
-import com.xy.services.IShopCategroyService;
+import com.xy.services.ShopCategroyService;
 import com.xy.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +22,7 @@ import java.util.List;
 public class ShopCategoryController {
 
     @Autowired
-    private IShopCategroyService shopCategroyService;
+    private ShopCategroyService shopCategroyService;
 
 
     /**

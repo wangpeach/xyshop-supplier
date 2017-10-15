@@ -1,7 +1,7 @@
 package com.xy.controller;
 
 import com.xy.models.Brand;
-import com.xy.services.IBrandService;
+import com.xy.services.BrandService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -16,7 +16,7 @@ import java.util.List;
 public class BrandController {
 
     @Autowired
-    private IBrandService brandService;
+    private BrandService brandService;
 
     @PostMapping("list")
     public @ResponseBody

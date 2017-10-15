@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import com.xy.models.ShopUpdateWallet;
 import com.xy.pojo.ParamsPojo;
-import com.xy.services.IShopUpdateWalletService;
+import com.xy.services.ShopUpdateWalletService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -20,7 +20,7 @@ import tk.mybatis.mapper.util.StringUtil;
 public class ShopUpdateWalletController {
 
     @Autowired
-    private IShopUpdateWalletService updateWalletService;
+    private ShopUpdateWalletService updateWalletService;
 
 
     @RequestMapping(value = "pagelist")

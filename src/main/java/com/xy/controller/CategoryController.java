@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import com.xy.models.Category;
 import com.xy.pojo.ParamsPojo;
-import com.xy.services.ICategoryService;
+import com.xy.services.CategoryService;
 import com.xy.utils.Config;
 import com.xy.utils.DateUtils;
 import com.xy.utils.FileUtils;
@@ -25,7 +25,7 @@ import java.util.List;
 public class CategoryController{
 
     @Autowired
-    private ICategoryService categoryService;
+    private CategoryService categoryService;
 
     @PostMapping(value = "pagelist")
     public PageInfo<Category> pageList(@RequestBody JSONObject json) {

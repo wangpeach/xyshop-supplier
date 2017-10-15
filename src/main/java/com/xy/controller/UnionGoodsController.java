@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import com.xy.models.UnionGoods;
 import com.xy.pojo.ParamsPojo;
-import com.xy.services.IUnionGoodService;
+import com.xy.services.UnionGoodService;
 import com.xy.utils.Config;
 import com.xy.utils.DateUtils;
 import com.xy.utils.StringUtils;
@@ -23,7 +23,7 @@ import java.util.List;
 public class UnionGoodsController {
 
     @Autowired
-    private IUnionGoodService goodService;
+    private UnionGoodService goodService;
 
 
     @ResponseBody

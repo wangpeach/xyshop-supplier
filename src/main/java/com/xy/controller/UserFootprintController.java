@@ -3,8 +3,8 @@ package com.xy.controller;
 import com.github.pagehelper.PageInfo;
 import com.xy.models.UnionGoods;
 import com.xy.models.UserFootprint;
-import com.xy.services.IUnionGoodService;
-import com.xy.services.IUserFootprintService;
+import com.xy.services.UnionGoodService;
+import com.xy.services.UserFootprintService;
 import com.xy.utils.Config;
 import com.xy.utils.DateUtils;
 import com.xy.utils.StringUtils;
@@ -22,10 +22,10 @@ import tk.mybatis.mapper.entity.Condition;
 public class UserFootprintController {
 
     @Autowired
-    private IUnionGoodService goodService;
+    private UnionGoodService goodService;
 
     @Autowired
-    private IUserFootprintService userFootprintService;
+    private UserFootprintService userFootprintService;
 
     /**
      * 用户浏览足迹

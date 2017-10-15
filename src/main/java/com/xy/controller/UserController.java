@@ -4,9 +4,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import com.xy.models.Ad;
 import com.xy.models.User;
+import com.xy.models.UserCoupon;
 import com.xy.pojo.ParamsPojo;
-import com.xy.services.IAdService;
-import com.xy.services.IUserService;
+import com.xy.services.AdService;
+import com.xy.services.UserCouponService;
+import com.xy.services.UserService;
 import com.xy.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,10 +28,13 @@ import java.util.Map;
 public class UserController {
 
     @Autowired
-    private IUserService userService;
+    private UserService userService;
 
     @Autowired
-    private IAdService adService;
+    private AdService adService;
+
+    @Autowired
+    private UserCouponService userCouponService;
 
     @ResponseBody
     @RequestMapping(value = "mapi/login")
@@ -137,6 +143,12 @@ public class UserController {
         return userService.selectPageListByParams(pj);
     }
 
+
+    /**
+     * 修改用户信息
+     * @param user
+     * @return
+     */
     @ResponseBody
     @RequestMapping(value = {"update", "mapi/update"})
     public String update(@ModelAttribute User user) {
@@ -144,5 +156,30 @@ public class UserController {
             return "success";
         }
         return "error";
+    }
+
+    /**
+     * 用户详情
+     * @param uuid
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("details")
+    public String details(@RequestParam String uuid) {
+
+        return null;
+    }
+
+
+    /**
+     * 优惠卷
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("coupons")
+    public List coupons(@RequestParam String user) {
+        UserCoupon coupon = new UserCoupon();
+        coupon.setUserid(user);
+        return userCouponService.selectList(coupon);
     }
 }
