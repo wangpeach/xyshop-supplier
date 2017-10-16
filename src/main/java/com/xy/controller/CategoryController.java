@@ -19,6 +19,10 @@ import tk.mybatis.mapper.util.StringUtil;
 
 import java.util.List;
 
+
+/**
+ * 商品类别服务
+ */
 @RestController
 @Scope(value = "prototype")
 @RequestMapping(value = "category/")
@@ -27,6 +31,12 @@ public class CategoryController{
     @Autowired
     private CategoryService categoryService;
 
+    /**
+     * 加载所有类别
+     *
+     * @param json the json
+     * @return the page info
+     */
     @PostMapping(value = "pagelist")
     public PageInfo<Category> pageList(@RequestBody JSONObject json) {
         ParamsPojo pj = new ParamsPojo(json);
@@ -50,6 +60,12 @@ public class CategoryController{
         return scs;
     }
 
+    /**
+     * 通过类别名搜索
+     *
+     * @param key the key
+     * @return the list
+     */
     @PostMapping(value = "list")
     public @ResponseBody
     List<Category> list(@RequestParam String key) {
@@ -61,6 +77,12 @@ public class CategoryController{
     }
 
 
+    /**
+     * 保存一级类别
+     *
+     * @param category the category
+     * @return the int
+     */
     @ResponseBody
     @RequestMapping("save-lv1")
     public int saveLv1(@ModelAttribute Category category) {
@@ -72,6 +94,14 @@ public class CategoryController{
         return categoryService.saveSelective(category);
     }
 
+    /**
+     * 保存二级类别
+     *
+     * @param name    the name
+     * @param iconImg the icon img
+     * @param attr    the attr
+     * @return the int
+     */
     @ResponseBody
     @RequestMapping("save-lv2")
     public int saveLv2(@RequestParam String name, @RequestParam String iconImg, @RequestParam String attr) {
@@ -91,6 +121,17 @@ public class CategoryController{
     }
 
 
+    /**
+     * 更新
+     *
+     * @param uuid    the uuid
+     * @param name    the name
+     * @param iconImg the icon img
+     * @param attr    the attr
+     * @param delAttr the del attr
+     * @param delOpt  the del opt
+     * @return the int
+     */
     @RequestMapping(value = "revise")
     public @ResponseBody
     int revise( @RequestParam String uuid, @RequestParam String name, @RequestParam String iconImg, @RequestParam String attr, @RequestParam String delAttr, @RequestParam String delOpt) {
@@ -114,6 +155,12 @@ public class CategoryController{
     }
 
 
+    /**
+     * 删除
+     *
+     * @param uuid the uuid
+     * @return the int
+     */
     @RequestMapping(value = "del")
     public @ResponseBody int del(@RequestParam String uuid) {
         return categoryService.deleteByPrimaryKey(uuid);
