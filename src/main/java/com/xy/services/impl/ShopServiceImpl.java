@@ -1,6 +1,7 @@
 package com.xy.services.impl;
 
 import com.github.pagehelper.PageInfo;
+import com.xy.config.ResourcesConfig;
 import com.xy.models.Shop;
 import com.xy.models.ShopWallet;
 import com.xy.pojo.ParamsPojo;
@@ -160,7 +161,7 @@ public class ShopServiceImpl extends BaseServiceImpl<Shop> implements ShopServic
     @Override
     public void autoFreeze() {
         Condition condition = new Condition(Shop.class);
-        condition.createCriteria().andLessThan(" TIMESTAMPDIFF(day, now(), endTime)", -Config.SHOP_OVERDUE);
+        condition.createCriteria().andLessThan(" TIMESTAMPDIFF(day, now(), endTime)", -ResourcesConfig.SHOP_OVERDUE);
         List<Shop> shops = super.selectListByCondition(condition);
         if (shops != null && !shops.isEmpty()) {
             shops.forEach(shop -> {
@@ -217,11 +218,11 @@ public class ShopServiceImpl extends BaseServiceImpl<Shop> implements ShopServic
 
             // 保存图片
             if (StringUtils.isNotNull(entity.getThumbImg())) {
-                com.xy.utils.FileUtils.moveFile(Config.FILETEMP + entity.getThumbImg(), Config.SHOPPATH);
+                com.xy.utils.FileUtils.moveFile(ResourcesConfig.FILETEMP + entity.getThumbImg(), ResourcesConfig.SHOPPATH);
             }
             if (StringUtils.isNotNull(entity.getMoreImg())) {
-                List<String> moreImg = Arrays.asList(StringUtils.strToArray(entity.getMoreImg(), "#", Config.FILETEMP));
-                com.xy.utils.FileUtils.moveFile(moreImg, Config.SHOPPATH);
+                List<String> moreImg = Arrays.asList(StringUtils.strToArray(entity.getMoreImg(), "#", ResourcesConfig.FILETEMP));
+                com.xy.utils.FileUtils.moveFile(moreImg, ResourcesConfig.SHOPPATH);
             }
 
             /**
@@ -237,13 +238,13 @@ public class ShopServiceImpl extends BaseServiceImpl<Shop> implements ShopServic
                 // 上传的图片名
                 etImgEle.forEach(element -> {
                     etDetailImg.add(element.attr("title"));
-                    com.xy.utils.FileUtils.moveFile(Config.FILETEMP + element.attr("title"), Config.SHOPPATH);
-                    element.attr("src", Config.SHOPURL + element.attr("title"));
+                    com.xy.utils.FileUtils.moveFile(ResourcesConfig.FILETEMP + element.attr("title"), ResourcesConfig.SHOPPATH);
+                    element.attr("src", ResourcesConfig.SHOPURL + element.attr("title"));
                 });
 
                 byte[] detail = etDoc.getElementsByTag("body").get(0).children().toString().getBytes();
                 String detailName = StringUtils.getUuid() + ".spd";
-                FileUtils.writeByteArrayToFile(new File(Config.DESSHOPPATH + detailName), detail, false);
+                FileUtils.writeByteArrayToFile(new File(ResourcesConfig.DESSHOPPATH + detailName), detail, false);
 
                 entity.setShopDetail(detailName);
             }
@@ -261,7 +262,7 @@ public class ShopServiceImpl extends BaseServiceImpl<Shop> implements ShopServic
                     otherMoreImg.removeAll(entityMoreImg);
                 }
 
-                File shopDetilHtml = new File(Config.DESSHOPPATH + other.getShopDetail());
+                File shopDetilHtml = new File(ResourcesConfig.DESSHOPPATH + other.getShopDetail());
                 if (StringUtils.isNotNull(entity.getShopDetail()) && shopDetilHtml.exists()) {
                     otDoc = Jsoup.parse(shopDetilHtml, "UTF-8");
                     if (otDoc != null && otDoc.childNodeSize() > 0) {
@@ -280,9 +281,9 @@ public class ShopServiceImpl extends BaseServiceImpl<Shop> implements ShopServic
                     }
 
                     otherMoreImg.forEach(s -> {
-                        com.xy.utils.FileUtils.deleteFile(Config.SHOPPATH + s);
+                        com.xy.utils.FileUtils.deleteFile(ResourcesConfig.SHOPPATH + s);
                     });
-                    com.xy.utils.FileUtils.deleteFile(Config.DESSHOPPATH + other.getShopDetail());
+                    com.xy.utils.FileUtils.deleteFile(ResourcesConfig.DESSHOPPATH + other.getShopDetail());
                 }
             }
 
@@ -313,10 +314,10 @@ public class ShopServiceImpl extends BaseServiceImpl<Shop> implements ShopServic
      * @return
      */
     public Shop handleResult(Shop shop, String lanlng) {
-        shop.setThumbImgShow(Config.SHOPURL + shop.getThumbImg());
-        String moreImg = org.apache.commons.lang3.StringUtils.join(StringUtils.strToArray(shop.getMoreImg(), "#", Config.SHOPURL), "#");
+        shop.setThumbImgShow(ResourcesConfig.SHOPURL + shop.getThumbImg());
+        String moreImg = org.apache.commons.lang3.StringUtils.join(StringUtils.strToArray(shop.getMoreImg(), "#", ResourcesConfig.SHOPURL), "#");
         shop.setMoreImgShow(moreImg);
-        shop.setShopDetail(Config.DESSHOPURL + shop.getShopDetail());
+        shop.setShopDetail(ResourcesConfig.DESSHOPURL + shop.getShopDetail());
         if (StringUtils.isNotNull(lanlng)) {
             // 计算两坐标距离
             String[] _lanlng = lanlng.split(",");

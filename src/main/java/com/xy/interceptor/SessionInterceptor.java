@@ -2,8 +2,8 @@ package com.xy.interceptor;
 
 import com.xy.models.Shop;
 import com.xy.services.ShopService;
-import com.xy.utils.Config;
-import com.xy.utils.CookieUtils;
+import com.xy.config.ResourcesConfig;
+import com.xy.config.CookieUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,14 +25,14 @@ public class SessionInterceptor extends HandlerInterceptorAdapter {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        Cookie cookie = CookieUtils.getCookieByName(request, Config.XY_TICKET);
+        Cookie cookie = CookieUtils.getCookieByName(request, ResourcesConfig.XY_TICKET);
         if (cookie == null) {
             this.goToLogin(request, response, "sessionInvalid");
             return false;
         }
         try {
             if (request.getSession().getAttribute("_loginshop_") == null) {
-                String[] values = StringUtils.split(cookie.getValue(), Config.XY_TICKET_SEPERATOR);
+                String[] values = StringUtils.split(cookie.getValue(), ResourcesConfig.XY_TICKET_SEPERATOR);
                 String ticket = values[0];
                 Shop shop = new Shop();
                 shop.setUuid(ticket);

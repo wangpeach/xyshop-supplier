@@ -2,6 +2,8 @@ package com.xy.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
+import com.xy.config.CookieUtils;
+import com.xy.config.ResourcesConfig;
 import com.xy.models.Logs;
 import com.xy.models.Shop;
 import com.xy.models.ShopUpdateWallet;
@@ -93,11 +95,11 @@ public class ShopController {
             Date today = format.parse(format.format(cal.getTime()));
 
             long day = (endTime.getTime() - today.getTime()) / (24 * 60 * 60 * 1000);
-            if (day > 0 && day < Config.SHOP_OVERDUE) {
+            if (day > 0 && day < ResourcesConfig.SHOP_OVERDUE) {
                 end += "<span style='color:red;'> (您的签约合同即将到期，请续约)</span>";
-            } else if (day < 0 && day >= -Config.SHOP_OVERDUE) {
+            } else if (day < 0 && day >= -ResourcesConfig.SHOP_OVERDUE) {
                 cal.setTime(endTime);
-                cal.add(Calendar.DAY_OF_MONTH, Config.SHOP_OVERDUE + 1);
+                cal.add(Calendar.DAY_OF_MONTH, ResourcesConfig.SHOP_OVERDUE + 1);
                 end += "<span style='color:red;'> (您的合同已逾期" + Math.abs(day) + "天，请续约。系统将于" + format.format(cal.getTime()) + "自动冻结账号)</span>";
             } else if (day == 0) {
                 end += "<span style='color:red;'> (您的签约合同已到期，请续约)</span>";
@@ -173,7 +175,7 @@ public class ShopController {
      */
     @PostMapping("mapi/list")
     public List<Shop> mApiList(@RequestParam String cates, @RequestParam String key, @RequestParam String position, @RequestParam String distance, @RequestParam String orderBy, @RequestParam int offset) {
-        return shopService.mApiList(cates, key, position, distance, orderBy, offset, Config.LIMIT);
+        return shopService.mApiList(cates, key, position, distance, orderBy, offset, ResourcesConfig.LIMIT);
     }
 
     @RequestMapping(value = {"only", "mapi/only"})

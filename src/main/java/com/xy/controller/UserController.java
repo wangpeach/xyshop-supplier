@@ -2,6 +2,7 @@ package com.xy.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
+import com.xy.config.ResourcesConfig;
 import com.xy.models.Ad;
 import com.xy.models.User;
 import com.xy.models.UserCoupon;
@@ -88,14 +89,14 @@ public class UserController {
     public Map<String, Object> uploadHead(@RequestParam String base64, @RequestParam String userId) {
         Map<String, Object> resMap = new HashMap<>();
         String fileName = StringUtils.getUuid();
-        boolean res = FileUtils.ImageUtil.generateImage(base64, Config.HEADPATH, fileName, "png");
+        boolean res = FileUtils.ImageUtil.generateImage(base64, ResourcesConfig.HEADPATH, fileName, "png");
         if (res) {
             User user = new User();
             user.setUuid(userId);
             user.setHeadImg(fileName + ".png");
             if (userService.updateByPrimaryKeySelective(user) > 0) {
                 resMap.put("status", "success");
-                resMap.put("url", Config.HEADURL + fileName + ".png");
+                resMap.put("url", ResourcesConfig.HEADURL + fileName + ".png");
             } else {
                 resMap.put("status", "error:101");
             }
@@ -177,7 +178,7 @@ public class UserController {
      */
     @ResponseBody
     @RequestMapping("coupons")
-    public List coupons(@RequestParam String user) {
+    public List coupons(@RequestParam String user, @RequestParam String shop, @RequestParam String good) {
         UserCoupon coupon = new UserCoupon();
         coupon.setUserid(user);
         return userCouponService.selectList(coupon);

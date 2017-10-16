@@ -106,6 +106,8 @@ public class Coupon {
      */
     private String author;
 
+
+
     /**
      * 创建时间
      */

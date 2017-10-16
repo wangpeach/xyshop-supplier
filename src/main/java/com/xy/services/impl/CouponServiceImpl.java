@@ -5,5 +5,5 @@ import com.xy.services.CouponService;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CouponBaseServiceImpl extends BaseServiceImpl<Coupon> implements CouponService {
+public class CouponServiceImpl extends BaseServiceImpl<Coupon> implements CouponService {
 }

@@ -3,7 +3,7 @@ package com.xy.services.impl;
 import com.github.pagehelper.PageInfo;
 import com.xy.models.ShopCategory;
 import com.xy.services.ShopCategroyService;
-import com.xy.utils.Config;
+import com.xy.config.ResourcesConfig;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Condition;
 
@@ -59,7 +59,7 @@ public class ShopCategoryServiceImpl extends BaseServiceImpl<ShopCategory> imple
 
     @Override
     public ShopCategory handleResult(ShopCategory arg) {
-        arg.setIconImgPath(Config.ICONURL + arg.getIconImg());
+        arg.setIconImgPath(ResourcesConfig.ICONURL + arg.getIconImg());
         return arg;
     }
 }

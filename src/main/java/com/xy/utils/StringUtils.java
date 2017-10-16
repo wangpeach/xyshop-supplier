@@ -116,6 +116,7 @@ public class StringUtils {
      * 银行卡号 123445678901234123
      * To
      * 1234 456 7890 1234 123
+     *
      * @param arg
      * @param group
      * @param join
@@ -126,7 +127,7 @@ public class StringUtils {
         StringBuilder sbr = new StringBuilder();
         for (int i = 0; i < charArray.length; i++) {
             sbr.append(charArray[i]);
-            if((i+1) % group == 0) {
+            if ((i + 1) % group == 0) {
                 sbr.append(join);
             }
         }
@@ -137,8 +138,8 @@ public class StringUtils {
     /**
      * 根据分割字符串获得字符串数组
      *
-     * @param content   原始字符串
-     * @param split 分割符
+     * @param content 原始字符串
+     * @param split   分割符
      * @return
      */
     public static String[] strToArray(String content, String split) {
@@ -150,7 +151,9 @@ public class StringUtils {
     }
 
     public static String[] strToArray(String content, String split, String prefix, String suffix) {
-        if (content == null || "".equals(content)) return new String[0];
+        if (content == null || "".equals(content)) {
+            return new String[0];
+        }
         String[] strArr = content.split(split);
         StringBuilder sbr = new StringBuilder();
         for (int i = 0; i < strArr.length; i++) {
@@ -166,13 +169,15 @@ public class StringUtils {
      * @param smallCamel 大小驼峰,是否为小驼峰
      * @return 转换后的字符串
      */
+    private static Pattern ucPattern = Pattern.compile("([A-Za-z\\d]+)(_)?");
+
     public static String underline2Camel(String line, boolean smallCamel) {
         if (line == null || "".equals(line)) {
             return "";
         }
         StringBuffer sb = new StringBuffer();
-        Pattern pattern = Pattern.compile("([A-Za-z\\d]+)(_)?");
-        Matcher matcher = pattern.matcher(line);
+
+        Matcher matcher = ucPattern.matcher(line);
         while (matcher.find()) {
             String word = matcher.group();
             sb.append(smallCamel && matcher.start() == 0 ? Character.toLowerCase(word.charAt(0)) : Character.toUpperCase(word.charAt(0)));
@@ -192,14 +197,15 @@ public class StringUtils {
      * @param line 源字符串
      * @return 转换后的字符串
      */
+    private static Pattern cuPattern = Pattern.compile("[A-Z]([a-z\\d]+)?");
+
     public static String camel2Underline(String line) {
         if (line == null || "".equals(line)) {
             return "";
         }
         line = String.valueOf(line.charAt(0)).toUpperCase().concat(line.substring(1));
         StringBuffer sb = new StringBuffer();
-        Pattern pattern = Pattern.compile("[A-Z]([a-z\\d]+)?");
-        Matcher matcher = pattern.matcher(line);
+        Matcher matcher = cuPattern.matcher(line);
         while (matcher.find()) {
             String word = matcher.group();
             sb.append(word.toUpperCase());

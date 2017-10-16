@@ -1,6 +1,7 @@
 package com.xy.services.impl;
 
 import com.github.pagehelper.PageInfo;
+import com.xy.config.ResourcesConfig;
 import com.xy.models.UnionGoods;
 import com.xy.services.UnionGoodService;
 import com.xy.utils.*;
@@ -27,7 +28,7 @@ public class UnionGoodServiceImpl extends BaseServiceImpl<UnionGoods> implements
     public int saveSelective(UnionGoods entity) {
         entity = this.handleInfo(entity);
         entity.setUuid(StringUtils.getUuid());
-        entity.setGoodNo(Config.GOOD_PREFIX + RandomUtil.getRandom(12, RandomUtil.TYPE.NUMBER));
+        entity.setGoodNo(ResourcesConfig.GOOD_PREFIX + RandomUtil.getRandom(12, RandomUtil.TYPE.NUMBER));
         entity.setAddTime(DateUtils.getCurrentDate());
         entity.setStatus("wait");
         return super.saveSelective(entity);
@@ -69,11 +70,11 @@ public class UnionGoodServiceImpl extends BaseServiceImpl<UnionGoods> implements
 
             // 保存图片
             if (StringUtils.isNotNull(entity.getThumbImg())) {
-                com.xy.utils.FileUtils.moveFile(Config.FILETEMP + entity.getThumbImg(), Config.PRODUCTIMGPATH);
+                com.xy.utils.FileUtils.moveFile(ResourcesConfig.FILETEMP + entity.getThumbImg(), ResourcesConfig.PRODUCTIMGPATH);
             }
             if (StringUtils.isNotNull(entity.getMoreImg())) {
-                List<String> moreImg = Arrays.asList(StringUtils.strToArray(entity.getMoreImg(), "#", Config.FILETEMP));
-                com.xy.utils.FileUtils.moveFile(moreImg, Config.PRODUCTIMGPATH);
+                List<String> moreImg = Arrays.asList(StringUtils.strToArray(entity.getMoreImg(), "#", ResourcesConfig.FILETEMP));
+                com.xy.utils.FileUtils.moveFile(moreImg, ResourcesConfig.PRODUCTIMGPATH);
             }
 
             /**
@@ -89,13 +90,13 @@ public class UnionGoodServiceImpl extends BaseServiceImpl<UnionGoods> implements
                 // 上传的图片名
                 etImgEle.forEach(element -> {
                     etDetailImg.add(element.attr("title"));
-                    com.xy.utils.FileUtils.moveFile(Config.FILETEMP + element.attr("title"), Config.PRODUCTIMGPATH);
-                    element.attr("src", Config.PRODUCTIMGURL + element.attr("title"));
+                    com.xy.utils.FileUtils.moveFile(ResourcesConfig.FILETEMP + element.attr("title"), ResourcesConfig.PRODUCTIMGPATH);
+                    element.attr("src", ResourcesConfig.PRODUCTIMGURL + element.attr("title"));
                 });
 
                 byte[] detail = etDoc.getElementsByTag("body").get(0).children().toString().getBytes();
                 String detailName = StringUtils.getUuid() + ".spd";
-                FileUtils.writeByteArrayToFile(new File(Config.DESGOODSPATH + detailName), detail, false);
+                FileUtils.writeByteArrayToFile(new File(ResourcesConfig.DESGOODSPATH + detailName), detail, false);
 
                 entity.setDesFile(detailName);
             }
@@ -113,7 +114,7 @@ public class UnionGoodServiceImpl extends BaseServiceImpl<UnionGoods> implements
                     otherMoreImg.removeAll(entityMoreImg);
                 }
 
-                File shopDetilHtml = new File(Config.DESGOODSPATH + other.getDesFile());
+                File shopDetilHtml = new File(ResourcesConfig.DESGOODSPATH + other.getDesFile());
                 if (StringUtils.isNotNull(entity.getDesFile()) && shopDetilHtml.exists()) {
                     otDoc = Jsoup.parse(shopDetilHtml, "UTF-8");
                     if (otDoc != null && otDoc.childNodeSize() > 0) {
@@ -132,9 +133,9 @@ public class UnionGoodServiceImpl extends BaseServiceImpl<UnionGoods> implements
                     }
 
                     otherMoreImg.forEach(s -> {
-                        com.xy.utils.FileUtils.deleteFile(Config.PRODUCTIMGPATH + s);
+                        com.xy.utils.FileUtils.deleteFile(ResourcesConfig.PRODUCTIMGPATH + s);
                     });
-                    com.xy.utils.FileUtils.deleteFile(Config.DESGOODSPATH + other.getDesFile());
+                    com.xy.utils.FileUtils.deleteFile(ResourcesConfig.DESGOODSPATH + other.getDesFile());
                 }
             }
         } catch (IOException e) {
@@ -159,9 +160,9 @@ public class UnionGoodServiceImpl extends BaseServiceImpl<UnionGoods> implements
 
     @Override
     public UnionGoods handleResult(UnionGoods good) {
-        good.setThumbImgShow(Config.PRODUCTIMGURL + good.getThumbImg());
-        good.setMoreImgShow(org.apache.commons.lang3.StringUtils.join(Arrays.asList(StringUtils.strToArray(good.getMoreImg(), "#", Config.PRODUCTIMGURL)), "#"));
-        good.setDesFile(Config.DESGOODSURL + good.getDesFile());
+        good.setThumbImgShow(ResourcesConfig.PRODUCTIMGURL + good.getThumbImg());
+        good.setMoreImgShow(org.apache.commons.lang3.StringUtils.join(Arrays.asList(StringUtils.strToArray(good.getMoreImg(), "#", ResourcesConfig.PRODUCTIMGURL)), "#"));
+        good.setDesFile(ResourcesConfig.DESGOODSURL + good.getDesFile());
         return good;
     }
 }

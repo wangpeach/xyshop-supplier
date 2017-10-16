@@ -5,7 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.xy.models.UnionGoods;
 import com.xy.pojo.ParamsPojo;
 import com.xy.services.UnionGoodService;
-import com.xy.utils.Config;
+import com.xy.config.ResourcesConfig;
 import com.xy.utils.DateUtils;
 import com.xy.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -178,7 +178,7 @@ public class UnionGoodsController {
             cri.andLike("name", "%" + key + "%");
         }
         cond.setOrderByClause(" sale_num desc");
-        return goodService.selectPageInfoByCondition(cond, offset, Config.LIMIT).getList();
+        return goodService.selectPageInfoByCondition(cond, offset, ResourcesConfig.LIMIT).getList();
     }
 
     @ResponseBody

@@ -1,29 +1,42 @@
 package com.xy.controller;
 
+import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.PageInfo;
+import com.xy.models.UnionOrders;
+import com.xy.services.UnionOrderService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+
 
 @RestController
 @RequestMapping("order/")
 public class UnionOrderController {
 
+    @Autowired
+    private UnionOrderService orderService;
+
     @ResponseBody
-    @RequestMapping(value = {"list", "mapi/list"})
-    public List<Order> list() {
+    @RequestMapping(value = {"list"})
+    public PageInfo<UnionOrders> list(@RequestBody JSONObject jsonObject) {
+
+        return null;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "mapi/list")
+    public List<UnionOrders> list(@RequestParam String user) {
 
         return null;
     }
 
     @ResponseBody
     @RequestMapping("mapi/create")
-    public Map<String, Object> createOrder(@RequestParam String uuid, @RequestParam String good, @RequestParam int num) {
-
+    public Map<String, Object> createOrder(@RequestParam String user, @RequestParam String shop, @RequestParam String good, @RequestParam int num) {
+        orderService.saveSelective(user, shop, good, num);
         return null;
     }
 

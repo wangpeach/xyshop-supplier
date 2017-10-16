@@ -2,6 +2,7 @@ package com.xy.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
+import com.xy.config.ResourcesConfig;
 import com.xy.models.ShopCategory;
 import com.xy.pojo.ParamsPojo;
 import com.xy.services.ShopCategroyService;
@@ -89,7 +90,7 @@ public class ShopCategoryController {
         cate.setAddTime(DateUtils.getCurrentDate());
 
         // 移动文件到目标文件夹
-        FileUtils.moveFile(Config.FILETEMP + cate.getIconImg(), Config.ICONPATH);
+        FileUtils.moveFile(ResourcesConfig.FILETEMP + cate.getIconImg(), ResourcesConfig.ICONPATH);
 
         return shopCategroyService.saveSelective(cate);
     }
@@ -111,7 +112,7 @@ public class ShopCategoryController {
         cate.setAddTime(DateUtils.getCurrentDate());
 
         // 移动文件到目标文件夹
-        FileUtils.moveFile(Config.FILETEMP + cate.getIconImg(), Config.ICONPATH);
+        FileUtils.moveFile(ResourcesConfig.FILETEMP + cate.getIconImg(), ResourcesConfig.ICONPATH);
 
         return shopCategroyService.saveSelective(cate);
     }
@@ -127,9 +128,9 @@ public class ShopCategoryController {
         ShopCategory sc = shopCategroyService.selectOnlyByKey(cate.getUuid());
         if(StringUtils.isNull(sc.getIconImg()) || !sc.getIconImg().equals(cate.getIconImg())) {
             // 删除原图片
-            FileUtils.deleteFile(Config.ICONPATH + sc.getIconImg());
+            FileUtils.deleteFile(ResourcesConfig.ICONPATH + sc.getIconImg());
             // 移动文件到目标文件夹
-            FileUtils.moveFile(Config.FILETEMP + cate.getIconImg(), Config.ICONPATH);
+            FileUtils.moveFile(ResourcesConfig.FILETEMP + cate.getIconImg(), ResourcesConfig.ICONPATH);
         }
         return shopCategroyService.updateByPrimaryKeySelective(cate);
     }

@@ -41,6 +41,12 @@ public class UserCoupon {
     private String addTime;
 
     /**
+     * 优惠卷是否可用
+     */
+    @Transient
+    private boolean disabled;
+
+    /**
      * @return uuid
      */
     public String getUuid() {
@@ -164,5 +170,13 @@ public class UserCoupon {
 
     public void setCoupon(Coupon coupon) {
         this.coupon = coupon;
+    }
+
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
     }
 }

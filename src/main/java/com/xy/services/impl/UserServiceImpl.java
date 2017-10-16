@@ -4,7 +4,7 @@ import com.github.pagehelper.PageInfo;
 import com.xy.models.User;
 import com.xy.pojo.ParamsPojo;
 import com.xy.services.UserService;
-import com.xy.utils.Config;
+import com.xy.config.ResourcesConfig;
 import com.xy.utils.StringUtils;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Condition;
@@ -73,7 +73,7 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
 
     @Override
     public User handleResult(User arg) {
-        arg.setHeadImg(Config.HEADURL + arg.getHeadImg());
+        arg.setHeadImg(ResourcesConfig.HEADURL + arg.getHeadImg());
         return arg;
     }
 }

@@ -5,7 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.xy.models.Category;
 import com.xy.pojo.ParamsPojo;
 import com.xy.services.CategoryService;
-import com.xy.utils.Config;
+import com.xy.config.ResourcesConfig;
 import com.xy.utils.DateUtils;
 import com.xy.utils.FileUtils;
 import com.xy.utils.RandomUtil;
@@ -56,7 +56,7 @@ public class CategoryController{
         cd.setOrderByClause(pj.getOrder());
 
         PageInfo<Category> scs = categoryService.selectPageInfoByCondition(cd, pj.getStart(), pj.getLength());
-        scs.getList().forEach(s -> s.setIconImgShow(Config.ICONURL + s.getIconImg()));
+        scs.getList().forEach(s -> s.setIconImgShow(ResourcesConfig.ICONURL + s.getIconImg()));
         return scs;
     }
 
@@ -90,7 +90,7 @@ public class CategoryController{
         category.setLevel(1);
         category.setCatId(RandomUtil.getRandom(8, RandomUtil.TYPE.CAPITAL));
         category.setAddTime(DateUtils.getCurrentDate());
-        FileUtils.moveFile(Config.FILETEMP + category.getIconImg(), Config.ICONPATH);
+        FileUtils.moveFile(ResourcesConfig.FILETEMP + category.getIconImg(), ResourcesConfig.ICONPATH);
         return categoryService.saveSelective(category);
     }
 
@@ -112,7 +112,7 @@ public class CategoryController{
         cate.setLevel(2);
         cate.setCatId(cate.getCatPid() +"_"+ RandomUtil.getRandom(8, RandomUtil.TYPE.CAPITAL));
         cate.setAddTime(DateUtils.getCurrentDate());
-        FileUtils.moveFile(Config.FILETEMP + cate.getIconImg(), Config.ICONPATH);
+        FileUtils.moveFile(ResourcesConfig.FILETEMP + cate.getIconImg(), ResourcesConfig.ICONPATH);
         int result = categoryService.saveSelective(cate);
 
 
@@ -138,9 +138,9 @@ public class CategoryController{
         Category sc = categoryService.selectOnlyByKey(uuid);
         if(com.xy.utils.StringUtils.isNull(sc.getIconImg()) || !sc.getIconImg().equals(iconImg)) {
             // 删除原图片
-            FileUtils.deleteFile(Config.ICONPATH + sc.getIconImg());
+            FileUtils.deleteFile(ResourcesConfig.ICONPATH + sc.getIconImg());
             // 移动文件到目标文件夹
-            FileUtils.moveFile(Config.FILETEMP + iconImg, Config.ICONPATH);
+            FileUtils.moveFile(ResourcesConfig.FILETEMP + iconImg, ResourcesConfig.ICONPATH);
 
             sc.setIconImg(iconImg);
         }

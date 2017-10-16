@@ -29,8 +29,6 @@
     </bean>
 
 
-
-
     <context:component-scan base-package="com.xy.*">
         <context:exclude-filter type="regex" expression="com.xy.controller" ></context:exclude-filter>
     </context:component-scan>
