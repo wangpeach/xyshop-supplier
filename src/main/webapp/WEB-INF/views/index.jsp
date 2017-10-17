@@ -43,7 +43,7 @@
                                         </li>
                                     </ul>
                                 </div>
-                                <div class="logo-element">汇
+                                <div class="logo-element">畅
                                 </div>
                             </li>
                             <li>
