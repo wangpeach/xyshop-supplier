@@ -6,8 +6,10 @@ import com.xy.models.UnionOrders;
 import com.xy.services.UnionOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpRequest;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -59,5 +61,10 @@ public class UnionOrderController {
     public String payment(@RequestParam String orderNo, @RequestParam String paywhy, @RequestParam String coupon) {
 
         return null;
+    }
+
+    @RequestMapping("receive_notify")
+    public void receive_notify(HttpServletRequest request) {
+
     }
 }

@@ -8,6 +8,7 @@ import com.xy.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Condition;
+import tk.mybatis.mapper.entity.Example;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -28,7 +29,7 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
     private UserService userService;
 
     @Autowired
-    private CouponService couponService;
+    private UserCouponService couponService;
 
 
     @Override
@@ -42,7 +43,7 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
         entity.setShopUuid(shopId);
         UnionGoods good = goodService.selectOnly(entity);
 
-        if(good != null && shop != null && good != null) {
+        if (good != null && shop != null && good != null) {
             order.setUuid(StringUtils.getUuid());
             order.setAddTime(DateUtils.getCurrentDate());
 
@@ -60,22 +61,18 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
             // 密码串码, 用户到店核销
             order.setCardCode(StringUtils.splitWithChar(RandomUtil.getRandom(17, RandomUtil.TYPE.NUMBER), 4, ' '));
 
-            // 检索隐式使用的优惠卷
-            Condition cond = new Condition(Coupon.class);
-            cond.createCriteria().andEqualTo("useMethod", "implicit").andEqualTo("status", "online");
-            cond.setOrderByClause("to_user_value desc");
-            List<Coupon> coupons = couponService.selectListByCondition(cond);
-            if(coupons != null && coupons.size() > 0) {
-                order.setCoupon(null);
-                order.setPreferentialPrice(BigDecimal.valueOf(0));
+            //查询满足使用条件的优惠卷
+//            Coupon coupon = couponService.selectByOrder(user, order.getTotalPrice());
+//            if (coupon != null) {
+//                order.setCoupon(coupon.getUuid());
+//
+//                order.setPreferentialPrice(BigDecimal.valueOf(0));
+//            }
 
-                // TODO: 2017/10/16 订单自动使用隐式优惠卷功能，目前因数据库未同步到服务器，不是最新版本，无法开发，待同步最新版本数据库后开发，
-                // TODO: 2017/10/16 如果有合适的优惠卷，根据优惠卷使用条件和订单总金额对比，判断需要使用哪个优惠卷
-
-
-            }
-
+            // 实际支付金额
             order.setPayPrice(BigDecimal.valueOf(0));
+
+            // 用户支付后更改支付方式
             order.setPayWay(null);
 
             return super.saveSelective(order);

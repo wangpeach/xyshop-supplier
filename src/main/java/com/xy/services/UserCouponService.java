@@ -1,6 +1,11 @@
 package com.xy.services;
 
+import com.xy.models.Coupon;
+import com.xy.models.UnionOrders;
+import com.xy.models.User;
 import com.xy.models.UserCoupon;
+
+import java.math.BigDecimal;
 
 public interface UserCouponService extends BaseService<UserCoupon> {
 
@@ -10,4 +15,6 @@ public interface UserCouponService extends BaseService<UserCoupon> {
      * 处理过期的优惠卷
      */
     void autoTrash();
+
+    Coupon selectByOrder(User user, UnionOrders order);
 }

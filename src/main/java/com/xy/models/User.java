@@ -6,6 +6,13 @@ import java.math.BigDecimal;
 
 public class User {
 
+    public User() {}
+
+    public User(int coin, String name) {
+        this.coin = BigDecimal.valueOf(coin);
+        this.name = name;
+    }
+
     @Id
     private String uuid;
 
@@ -144,6 +151,10 @@ public class User {
     private Integer sceneid;
 
     private String status;
+    /**
+     * 是否新用户，默认true
+     */
+    private boolean isNew;
 
     /**
      * @return uuid
@@ -597,5 +608,13 @@ public class User {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public boolean isNew() {
+        return isNew;
+    }
+
+    public void setNew(boolean aNew) {
+        isNew = aNew;
     }
 }

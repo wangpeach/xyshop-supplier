@@ -31,5 +31,6 @@
     <result column="openid" jdbcType="VARCHAR" property="openid" />
     <result column="sceneid" jdbcType="INTEGER" property="sceneid" />
     <result column="status" jdbcType="VARCHAR" property="status" />
+    <result column="is_new" jdbcType="TINYINT" property="isNew" />
   </resultMap>
 </mapper>
