@@ -14,17 +14,13 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 <body class="gray-bg">
     <input type="hidden" id="js-shop-uuid" value="${_loginshop_.uuid }">
     <input type="hidden" id="js-shop-name" value="${_loginshop_.name }">
-    <div class="row wrapper border-bottom white-bg page-heading">
+    <div class="row wrapper border-bottom">
     	<div>
     		<div class="col-sm-12" style="background: #ececec; padding-bottom: 1.2rem; margin-bottom: 2rem;">
              <h2 id="shopName" style="color: darkorange;"></h2>
              			【<span>上次登录时间： </span> <span id="lastTime" style="color: slategrey;">${lastTime }</span>】 【
              <span>上次登录Ip： </span> <span id="lastIp" style="color: slategrey;">${lastIp}</span>】 【
              <span>合同到期日期： </span> <span id="endTime" style="color: slategrey;">${end}</span>】
-         </div>
-         <div class="col-sm-12">
-             <p>XXXX对合作商家的核心价值： 1. 发掘新顾客，增加销售额 2. 增强老顾客的忠诚度，吸引高质量会员 3. 提高服务质量，降低服务成本 4. 建立企业与顾客间低成本、高到达率的沟通渠道 5. 开展精准营销，提升营销效能 </p>
-             <p>顾客忠诚度--这是一组来自麦肯锡（Mckinsey）的数据报告： 1. 顾客的忠诚度不仅可以带来高额利润，而且还可以降低营销成本。 2. 保持一个消费者的营销费用仅是吸引一个新消费者的1/5； 3. 向现有客户销售的机率是50%，而向一个新客户销售产品的机率仅有15%； 4. 客户忠诚度下降5％，企业利润下降25％； 5. 如果将每年的客户关系保持率增加5个百分点，可能使利润增长85％； 6. 企业60％ 的新客户来自现有客户的推荐……</p>
          </div>
     	</div>
     </div>
