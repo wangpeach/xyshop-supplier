@@ -19,22 +19,9 @@ public class ResourcesConfig implements EnvironmentAware {
     // 系统真实路径
     public static final String SYSTEM_PATH = System.getProperty("evan.xyslr");
 
-    public static final String XY_TICKET = "xy-PVxfFClQP7HcRdw33gfL6yWYUfxP5y37";
-    public static final String XY_TICKET_SEPERATOR = "_";
-    public static final String XY_TICKET_KEY = "xy-shop-supplier";
-
-    // 商品编号前缀
-    public static final String GOOD_PREFIX = "GN-";
-
-    // 查询多少条数据
-    public static int LIMIT = 20;
 
 
-    // 优惠卷前缀
-    public static final String XY_COUPON_PREFIX = "YH-";
 
-    // 商铺允许逾期天数
-    public static int SHOP_OVERDUE = 0;
 
     //文件临时保存路径
     public static String FILETEMP;
@@ -84,13 +71,13 @@ public class ResourcesConfig implements EnvironmentAware {
     public static String DESADPATH;
     public static String DESADURL;
 
-
+    @Override
     public void setEnvironment(Environment environment) {
         this.env = environment;
 
-        ResourcesConfig.SHOP_OVERDUE = Integer.parseInt(env.getProperty("shop.overdue"));
+        OtherConfig.SHOP_OVERDUE = Integer.parseInt(env.getProperty("shop.overdue"));
 
-        ResourcesConfig.LIMIT = Integer.parseInt(env.getProperty("select.limit"));
+        OtherConfig.LIMIT = Integer.parseInt(env.getProperty("select.limit"));
 
         // 资源保存根目标
         String basePath = env.getProperty("file.basePath");

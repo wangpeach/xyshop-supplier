@@ -55,6 +55,7 @@
                                     <li><a class="J_menuItem" href="shop/goodspage.html">商品管理</a></li>
                                     <li><a class="J_menuItem" href="shop/orderpage.html">订单管理</a></li>
                                     <li><a class="J_menuItem" href="shop/setting.html">店铺设置</a></li>
+                                    <li><a class="J_menuItem" href="shop/coupon.html">优惠卷管理</a></li>
                                 </ul>
                             </li>
                             <li>

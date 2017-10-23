@@ -2,6 +2,7 @@ package com.xy.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
+import com.xy.config.OtherConfig;
 import com.xy.models.UnionGoods;
 import com.xy.pojo.ParamsPojo;
 import com.xy.services.UnionGoodService;
@@ -155,11 +156,14 @@ public class UnionGoodsController {
 
     @ResponseBody
     @RequestMapping("list")
-    public List<UnionGoods> list(@RequestParam String name) {
+    public List<UnionGoods> list(@RequestParam String name, @RequestParam String shop) {
         Condition cond = new Condition(UnionGoods.class);
         Example.Criteria cri = cond.createCriteria();
         if (StringUtils.isNotNull(name)) {
             cri.andLike("name", "%" + name + "%");
+        }
+        if(StringUtils.isNotNull(shop)) {
+            cri.andEqualTo("shopUuid", shop);
         }
         cond.setOrderByClause(" sale_num desc");
         return goodService.selectListByCondition(cond);
@@ -167,7 +171,7 @@ public class UnionGoodsController {
 
 
     @ResponseBody
-    @RequestMapping("mapi/list")
+    @RequestMapping(value = {"mapi/list"})
     public List<UnionGoods> mApiList(@RequestParam String shop, @RequestParam String key, @RequestParam int offset) {
         Condition cond = new Condition(UnionGoods.class);
         Example.Criteria cri = cond.createCriteria();
@@ -178,7 +182,7 @@ public class UnionGoodsController {
             cri.andLike("name", "%" + key + "%");
         }
         cond.setOrderByClause(" sale_num desc");
-        return goodService.selectPageInfoByCondition(cond, offset, ResourcesConfig.LIMIT).getList();
+        return goodService.selectPageInfoByCondition(cond, offset, OtherConfig.LIMIT).getList();
     }
 
     @ResponseBody

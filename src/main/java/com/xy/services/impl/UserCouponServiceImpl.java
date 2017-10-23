@@ -30,6 +30,7 @@ public class UserCouponServiceImpl extends BaseServiceImpl<UserCoupon> implement
     @Autowired
     private UnionOrderService orderService;
 
+
     @Override
     public UserCoupon selectList(String userId, String shopId, String goodTypeId, String goodId) {
         UserCoupon userCoupon = new UserCoupon();
@@ -63,14 +64,14 @@ public class UserCouponServiceImpl extends BaseServiceImpl<UserCoupon> implement
 
 
     /**
-     * 查询订单满足使用条件的优惠卷
+     * 查询订单满足使用条件的官方优惠卷
      *
      * @param user  下单用户
      * @param order 下单金额
      * @return 返回满足条件的优惠卷
      */
     @Override
-    public Coupon selectByOrder(User user, UnionOrders order) {
+    public Coupon selectOfficialByOrder(User user, UnionOrders order) {
         // 符合条件的优惠卷
         Coupon target = null;
         // 检索隐式使用的优惠卷
@@ -85,8 +86,6 @@ public class UserCouponServiceImpl extends BaseServiceImpl<UserCoupon> implement
             // TODO: 2017/10/19 测试工作未做 ，上面两个已经做了..
             // TODO: 2017/10/19 新用户专享优惠卷仅限 管理员后台 添加， 并且只能面向全场商品  
 
-
-            String orientedUser = null;
             if (user.isNew()) {
                 // 查找出仅限新用户并且满足消费条件的优惠卷
                 target = this.find(coupons, order.getTotalPrice(), "newuser");

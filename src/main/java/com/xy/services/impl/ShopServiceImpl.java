@@ -1,6 +1,7 @@
 package com.xy.services.impl;
 
 import com.github.pagehelper.PageInfo;
+import com.xy.config.OtherConfig;
 import com.xy.config.ResourcesConfig;
 import com.xy.models.Shop;
 import com.xy.models.ShopWallet;
@@ -161,7 +162,7 @@ public class ShopServiceImpl extends BaseServiceImpl<Shop> implements ShopServic
     @Override
     public void autoFreeze() {
         Condition condition = new Condition(Shop.class);
-        condition.createCriteria().andLessThan(" TIMESTAMPDIFF(day, now(), endTime)", -ResourcesConfig.SHOP_OVERDUE);
+        condition.createCriteria().andLessThan(" TIMESTAMPDIFF(day, now(), endTime)", -OtherConfig.SHOP_OVERDUE);
         List<Shop> shops = super.selectListByCondition(condition);
         if (shops != null && !shops.isEmpty()) {
             shops.forEach(shop -> {

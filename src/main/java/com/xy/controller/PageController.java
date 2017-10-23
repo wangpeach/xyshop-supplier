@@ -1,10 +1,14 @@
 package com.xy.controller;
 
+import com.xy.models.Shop;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.servlet.ModelAndView;
 
+import javax.jms.Session;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -65,6 +69,19 @@ public class PageController {
     @RequestMapping(value = "/shop/setting.html")
     public String settingPage() {
         return "supplier/setting";
+    }
+
+
+    /**
+     * 商铺设置
+     * @return
+     */
+    @RequestMapping(value = "/shop/coupon.html")
+    public ModelAndView settingPage(ModelAndView view, @SessionAttribute("_loginshop_") Shop shop) {
+        System.out.println(shop.getUuid());
+        view.addObject("uuid", shop.getUuid());
+        view.setViewName("supplier/coupon_list");
+        return view;
     }
 
 

@@ -11,6 +11,7 @@ import tk.mybatis.mapper.entity.Condition;
 import tk.mybatis.mapper.entity.Example;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -61,13 +62,20 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
             // 密码串码, 用户到店核销
             order.setCardCode(StringUtils.splitWithChar(RandomUtil.getRandom(17, RandomUtil.TYPE.NUMBER), 4, ' '));
 
+            // 官方和商品创建的优惠卷合并
+            List<Coupon> offAndShop = new ArrayList<>();
             //查询满足使用条件的优惠卷
-//            Coupon coupon = couponService.selectByOrder(user, order.getTotalPrice());
-//            if (coupon != null) {
-//                order.setCoupon(coupon.getUuid());
-//
-//                order.setPreferentialPrice(BigDecimal.valueOf(0));
-//            }
+            Coupon coupon = couponService.selectOfficialByOrder(user, order);
+            offAndShop.add(coupon);
+
+//            couponService.selectShopByOrder();
+
+
+            if (coupon != null) {
+                order.setCoupon(coupon.getUuid());
+                order.setPreferentialPrice(coupon.getRuleValue());
+
+            }
 
             // 实际支付金额
             order.setPayPrice(BigDecimal.valueOf(0));

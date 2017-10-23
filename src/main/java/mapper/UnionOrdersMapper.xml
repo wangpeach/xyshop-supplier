@@ -21,6 +21,6 @@
     <result column="judged" jdbcType="BIT" property="judged" />
     <result column="card_code" jdbcType="VARCHAR" property="cardCode" />
     <result column="coupon" jdbcType="VARCHAR" property="coupon" />
-    <result column="preferential_price" jdbcType="DECIMAL" property="preferentialPrice" />
+    <result column="preferential_price" jdbcType="VARCHAR" property="preferentialPrice" />
   </resultMap>
 </mapper>

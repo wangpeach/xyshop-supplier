@@ -101,7 +101,7 @@ public class UnionOrders {
      * 优惠金额
      */
     @Column(name = "preferential_price")
-    private BigDecimal preferentialPrice;
+    private String preferentialPrice;
 
     /**
      * @return uuid
@@ -392,7 +392,7 @@ public class UnionOrders {
      *
      * @return preferential_price - 优惠金额
      */
-    public BigDecimal getPreferentialPrice() {
+    public String getPreferentialPrice() {
         return preferentialPrice;
     }
 
@@ -401,7 +401,7 @@ public class UnionOrders {
      *
      * @param preferentialPrice 优惠金额
      */
-    public void setPreferentialPrice(BigDecimal preferentialPrice) {
+    public void setPreferentialPrice(String preferentialPrice) {
         this.preferentialPrice = preferentialPrice;
     }
 }
