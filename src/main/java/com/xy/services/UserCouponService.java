@@ -1,10 +1,7 @@
 package com.xy.services;
 
 import com.sun.xml.internal.xsom.XSWildcard;
-import com.xy.models.Coupon;
-import com.xy.models.UnionOrders;
-import com.xy.models.User;
-import com.xy.models.UserCoupon;
+import com.xy.models.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
@@ -27,13 +24,20 @@ public interface UserCouponService extends BaseService<UserCoupon> {
     void autoTrash();
 
     /**
-     * 查询官方创建的隐式优惠卷
-     * @param user 下单用户
+     * 查询订单满足使用条件的官方优惠卷
+     *
+     * @param user  下单用户
      * @param order 订单信息
-     * @return
+     * @return 返回满足条件的优惠卷
      */
     Coupon selectOfficialByOrder(User user, UnionOrders order);
 
-
-//    Coupon selectShopByOrder(User user);
+    /**
+     * 查询订单满足使用条件的商铺优惠卷
+     * @param user 下单用户
+     * @param shop 接单商户
+     * @param order 订单信息
+     * @return
+     */
+    Coupon selectShopByOrder(User user, Shop shop, UnionOrders order);
 }

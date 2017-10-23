@@ -63,18 +63,23 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
             order.setCardCode(StringUtils.splitWithChar(RandomUtil.getRandom(17, RandomUtil.TYPE.NUMBER), 4, ' '));
 
             // 官方和商品创建的优惠卷合并
-            List<Coupon> offAndShop = new ArrayList<>();
-            //查询满足使用条件的优惠卷
-            Coupon coupon = couponService.selectOfficialByOrder(user, order);
-            offAndShop.add(coupon);
-
-//            couponService.selectShopByOrder();
+            List<Coupon> couponList = new ArrayList<>();
 
 
-            if (coupon != null) {
-                order.setCoupon(coupon.getUuid());
-                order.setPreferentialPrice(coupon.getRuleValue());
+            // 如果商户处于促销活动期间，则查询商户发布的优惠卷信息
+            if(shop.isActive()) {
+                Coupon shopCoupon = couponService.selectShopByOrder(user, shop, order);
+                couponList.add(shopCoupon);
 
+                // TODO: 2017/10/23  
+            }
+
+            //查询满足使用条件的官方优惠卷
+            Coupon offCoupon = couponService.selectOfficialByOrder(user, order);
+            couponList.add(offCoupon);
+            if (offCoupon != null) {
+                order.setCoupon(offCoupon.getUuid());
+                order.setPreferentialPrice(offCoupon.getRuleValue());
             }
 
             // 实际支付金额

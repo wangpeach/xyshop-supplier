@@ -1,9 +1,6 @@
 package com.xy.services.impl;
 
-import com.xy.models.Coupon;
-import com.xy.models.UnionOrders;
-import com.xy.models.User;
-import com.xy.models.UserCoupon;
+import com.xy.models.*;
 import com.xy.services.CouponService;
 import com.xy.services.UnionOrderService;
 import com.xy.services.UserCouponService;
@@ -29,6 +26,12 @@ public class UserCouponServiceImpl extends BaseServiceImpl<UserCoupon> implement
 
     @Autowired
     private UnionOrderService orderService;
+
+
+    /**
+     * 符合条件的优惠卷
+     */
+    Coupon target = null;
 
 
     @Override
@@ -62,53 +65,72 @@ public class UserCouponServiceImpl extends BaseServiceImpl<UserCoupon> implement
 //        couponService.updateByConditionSelective();
     }
 
-
-    /**
-     * 查询订单满足使用条件的官方优惠卷
-     *
-     * @param user  下单用户
-     * @param order 下单金额
-     * @return 返回满足条件的优惠卷
-     */
     @Override
     public Coupon selectOfficialByOrder(User user, UnionOrders order) {
-        // 符合条件的优惠卷
-        Coupon target = null;
-        // 检索隐式使用的优惠卷
-        Condition cond = new Condition(Coupon.class);
-        Example.Criteria cri = cond.createCriteria();
-        cri.andEqualTo("useMethod", "implicit").andEqualTo("status", "online");
-        cond.setOrderByClause("to_user_value desc");
-        List<Coupon> coupons = couponService.selectListByCondition(cond);
-        if (coupons != null && coupons.size() > 0) {
-            // TODO: 2017/10/16 订单自动使用隐式优惠卷功能，目前因数据库未同步到服务器，不是最新版本，无法开发，待同步最新版本数据库后开发，
-            // TODO: 2017/10/16 如果有合适的优惠卷，根据优惠卷使用条件和订单总金额对比，判断需要使用哪个优惠卷
-            // TODO: 2017/10/19 测试工作未做 ，上面两个已经做了..
-            // TODO: 2017/10/19 新用户专享优惠卷仅限 管理员后台 添加， 并且只能面向全场商品  
 
+        List<Coupon> coupons = this.selectByCond("lord");
+        if (coupons != null && coupons.size() > 0) {
             if (user.isNew()) {
                 // 查找出仅限新用户并且满足消费条件的优惠卷
-                target = this.find(coupons, order.getTotalPrice(), "newuser");
+                target = this.filter(coupons, order.getTotalPrice(), "newuser");
             } else {
                 // 查找出仅限老用户并且满足消费条件的优惠卷
-                target = this.find(coupons, order.getTotalPrice(), "olduser");
+                target = this.filter(coupons, order.getTotalPrice(), "olduser");
             }
-            if(target == null) {
+            if (target == null) {
                 // 查找出面向所有用户并且满足消费条件的优惠卷
-                target = this.find(coupons, order.getTotalPrice(), "all");
+                target = this.filter(coupons, order.getTotalPrice(), "all");
             }
         }
         return target;
     }
 
+
+    @Override
+    public Coupon selectShopByOrder(User user, Shop shop, UnionOrders order) {
+        List<Coupon> coupons = this.selectByCond(shop.getUuid());
+        if(coupons != null && coupons.size() > 0) {
+            UnionOrders condition = new UnionOrders();
+            condition.setShopUuid(shop.getUuid());
+            condition.setUserUuid(user.getUuid());
+            condition.setStatus("consumed");
+            int buys = orderService.count(condition);
+            if (buys == 0) {
+                target = this.filter(coupons, order.getTotalPrice(), "newuser");
+            } else {
+                target = this.filter(coupons, order.getTotalPrice(), "olduser");
+            }
+
+            if (target == null) {
+                target = this.filter(coupons, order.getTotalPrice(), "all");
+            }
+        }
+        return target;
+    }
+
+
+    private List<Coupon> selectByCond(String author) {
+        // 检索隐式使用的优惠卷
+        Condition cond = new Condition(Coupon.class);
+        Example.Criteria cri = cond.createCriteria();
+        cri.andEqualTo("useMethod", "implicit").andEqualTo("status", "online");
+        if(StringUtils.isNotNull(author)) {
+            cri.andEqualTo("author", author);
+        }
+        cond.setOrderByClause("to_user_value desc");
+        return couponService.selectListByCondition(cond);
+    }
+
+
     /**
      * 查找符合条件的优惠卷
+     *
      * @param coupons 可以使用的
-     * @param money 消费金额
-     * @param toUser 面向用户类型，所有，新用户，老用户
+     * @param money   消费金额
+     * @param toUser  面向用户类型，所有，新用户，老用户
      * @return
      */
-    private Coupon find(List<Coupon> coupons, BigDecimal money, String toUser) {
+    private Coupon filter(List<Coupon> coupons, BigDecimal money, String toUser) {
         // 过滤出所有符合 消费金额，用户类型的优惠卷
         return coupons.stream().filter(coupon -> toUser.equals(coupon.getToUser()) && money.compareTo(BigDecimal.valueOf(coupon.getToUserValue())) > -1).sorted(Comparator.comparing(Coupon::getToUserValue)).collect(Collectors.toList()).get(0);
     }
