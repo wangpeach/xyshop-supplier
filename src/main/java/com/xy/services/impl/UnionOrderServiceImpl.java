@@ -12,6 +12,7 @@ import tk.mybatis.mapper.entity.Condition;
 import tk.mybatis.mapper.entity.Example;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,7 +64,12 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
             // 密码串码, 用户到店核销
             order.setCardCode(StringUtils.splitWithChar(RandomUtil.getRandom(17, RandomUtil.TYPE.NUMBER), 4, ' '));
 
-            order = this.implicitCoupon(user, shop, order);
+            if(StringUtils.isNotNull(order.getCoupon())) {
+
+            } else {
+                order = this.implicitCoupon(user, shop, order);
+            }
+
 
             // 实际支付金额
             order.setPayPrice(BigDecimal.valueOf(0));
@@ -93,17 +99,17 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
         // 如果商户处于促销活动期间，则查询商户发布的优惠卷信息
         if (shop.isActive()) {
             Coupon shopCoupon = couponService.selectShopByOrder(user, shop, order);
-
+            // TODO: 2017/10/24 当前优惠卷使用量已经+1，并且已经处理了商户是否处于活动期， 接下来去要做的是对当前优惠卷使用规则区分
             switch (shopCoupon.getRule()) {
                 case "recoupon":
-                    // 返券
-                    shopCoupon.getRuleValue();
-                    // TODO: 2017/10/24 当前优惠卷使用量已经+1，并且已经处理了商户是否处于活动期， 接下来去要做的是对当前优惠卷使用规则区分
-
+                    // 返券，需要等用户消费成功才可以发放优惠卷
                     break;
                 case "discount":
                     // 折扣
-                    
+                    BigDecimal discount = new BigDecimal(shopCoupon.getRuleValue());
+                    discount = discount.divide(BigDecimal.valueOf(100));
+                    // 应付金额
+                    order.setPayPrice(order.getTotalPrice().subtract(order.getTotalPrice().multiply(discount)));
                     break;
                 case "fulldown":
                     // 满减
