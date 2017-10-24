@@ -1,13 +1,16 @@
 package com.xy.services.impl;
 
+import com.xy.config.Config;
 import com.xy.models.*;
 import com.xy.services.CouponService;
+import com.xy.services.ShopService;
 import com.xy.services.UnionOrderService;
 import com.xy.services.UserCouponService;
 import com.xy.utils.DateUtils;
 import com.xy.utils.StringUtils;
-import com.xy.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Condition;
 import tk.mybatis.mapper.entity.Example;
@@ -18,6 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
+@EnableAsync
 @Service
 public class UserCouponServiceImpl extends BaseServiceImpl<UserCoupon> implements UserCouponService {
 
@@ -27,6 +31,8 @@ public class UserCouponServiceImpl extends BaseServiceImpl<UserCoupon> implement
     @Autowired
     private UnionOrderService orderService;
 
+    @Autowired
+    private ShopService shopService;
 
     /**
      * 符合条件的优惠卷
@@ -68,7 +74,7 @@ public class UserCouponServiceImpl extends BaseServiceImpl<UserCoupon> implement
     @Override
     public Coupon selectOfficialByOrder(User user, UnionOrders order) {
 
-        List<Coupon> coupons = this.selectByCond("lord");
+        List<Coupon> coupons = this.selectByCond(Config.lord);
         if (coupons != null && coupons.size() > 0) {
             if (user.isNew()) {
                 // 查找出仅限新用户并且满足消费条件的优惠卷
@@ -82,6 +88,7 @@ public class UserCouponServiceImpl extends BaseServiceImpl<UserCoupon> implement
                 target = this.filter(coupons, order.getTotalPrice(), "all");
             }
         }
+        this.giveover(target);
         return target;
     }
 
@@ -89,32 +96,40 @@ public class UserCouponServiceImpl extends BaseServiceImpl<UserCoupon> implement
     @Override
     public Coupon selectShopByOrder(User user, Shop shop, UnionOrders order) {
         List<Coupon> coupons = this.selectByCond(shop.getUuid());
-        if(coupons != null && coupons.size() > 0) {
+        if (coupons != null && coupons.size() > 0) {
             UnionOrders condition = new UnionOrders();
             condition.setShopUuid(shop.getUuid());
             condition.setUserUuid(user.getUuid());
             condition.setStatus("consumed");
             int buys = orderService.count(condition);
             if (buys == 0) {
+                // 新用户
                 target = this.filter(coupons, order.getTotalPrice(), "newuser");
             } else {
+                // 老用户
                 target = this.filter(coupons, order.getTotalPrice(), "olduser");
             }
-
+            // 在面向所有用户优惠卷里查询
             if (target == null) {
                 target = this.filter(coupons, order.getTotalPrice(), "all");
             }
         }
+        this.giveover(target);
         return target;
     }
 
-
+    /**
+     * 根据创建人查询
+     *
+     * @param author
+     * @return
+     */
     private List<Coupon> selectByCond(String author) {
         // 检索隐式使用的优惠卷
         Condition cond = new Condition(Coupon.class);
         Example.Criteria cri = cond.createCriteria();
         cri.andEqualTo("useMethod", "implicit").andEqualTo("status", "online");
-        if(StringUtils.isNotNull(author)) {
+        if (StringUtils.isNotNull(author)) {
             cri.andEqualTo("author", author);
         }
         cond.setOrderByClause("to_user_value desc");
@@ -133,5 +148,45 @@ public class UserCouponServiceImpl extends BaseServiceImpl<UserCoupon> implement
     private Coupon filter(List<Coupon> coupons, BigDecimal money, String toUser) {
         // 过滤出所有符合 消费金额，用户类型的优惠卷
         return coupons.stream().filter(coupon -> toUser.equals(coupon.getToUser()) && money.compareTo(BigDecimal.valueOf(coupon.getToUserValue())) > -1).sorted(Comparator.comparing(Coupon::getToUserValue)).collect(Collectors.toList()).get(0);
+    }
+
+
+    /**
+     * 更新优惠卷发放量，或者优惠卷发放完毕更改状态为已售罄
+     *
+     * @param target
+     * @return
+     */
+    @Async
+    protected boolean giveover(Coupon target) {
+        int result = 0;
+        // 最终合适的优惠卷
+        if (target != null) {
+            target.setUsed(target.getUsed() + 1);
+            if (target.getTotal() > 0 && target.getUsed().equals(target.getTotal())) {
+                // 优惠卷已售罄
+                target.setStatus("giveover");
+                if (!Config.lord.equals(target.getAuthor())) {
+                    // 如果是商户某优惠卷售罄，检查商户是否还存在其他优惠卷信息，如果没有取消商户处于活动期间状态
+                    target.getAuthor();
+                    Coupon other = new Coupon();
+                    other.setAuthor(target.getAuthor());
+                    other.setStatus("online");
+                    result = couponService.count(target);
+                    // 因为到此还没有对优惠卷做出状态更改，所以查询出来有一条数据需要减去当前的优惠卷对象, 等于0标识该商户没有优惠卷了
+                    if (0 == (result - 1)) {
+                        Shop shop = new Shop();
+                        shop.setUuid(target.getAuthor());
+                        shop.setActive(false);
+                        shopService.updateByPrimaryKeySelective(shop);
+                    }
+                }
+            }
+            result = couponService.updateByPrimaryKeySelective(target);
+            if (result > 0) {
+                return true;
+            }
+        }
+        return false;
     }
 }

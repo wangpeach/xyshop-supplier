@@ -75,9 +75,9 @@ public class ResourcesConfig implements EnvironmentAware {
     public void setEnvironment(Environment environment) {
         this.env = environment;
 
-        OtherConfig.SHOP_OVERDUE = Integer.parseInt(env.getProperty("shop.overdue"));
+        Config.SHOP_OVERDUE = Integer.parseInt(env.getProperty("shop.overdue"));
 
-        OtherConfig.LIMIT = Integer.parseInt(env.getProperty("select.limit"));
+        Config.LIMIT = Integer.parseInt(env.getProperty("select.limit"));
 
         // 资源保存根目标
         String basePath = env.getProperty("file.basePath");

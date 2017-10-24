@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
  * Created by rjora on 2017/7/16 0016.
  */
 @Service
-public class ShopWalletBaseServiceImpl extends BaseServiceImpl<ShopWallet> implements ShopWalletService {
+public class ShopWalletServiceImpl extends BaseServiceImpl<ShopWallet> implements ShopWalletService {
     @Override
     public ShopWallet selectOnly(ShopWallet entity) {
         entity = super.selectOnly(entity);

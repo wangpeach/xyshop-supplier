@@ -12,7 +12,7 @@ public interface ShopService extends BaseService<Shop> {
     int del(Shop shop);
 
     /**
-     * 自动冻结商家
+     * 商铺逾期 15 天 自动冻结
      */
     void autoFreeze();
 

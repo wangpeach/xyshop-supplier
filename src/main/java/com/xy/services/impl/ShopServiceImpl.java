@@ -1,7 +1,7 @@
 package com.xy.services.impl;
 
 import com.github.pagehelper.PageInfo;
-import com.xy.config.OtherConfig;
+import com.xy.config.Config;
 import com.xy.config.ResourcesConfig;
 import com.xy.models.Shop;
 import com.xy.models.ShopWallet;
@@ -151,18 +151,20 @@ public class ShopServiceImpl extends BaseServiceImpl<Shop> implements ShopServic
         return this.handleResult(super.selectPageInfoByCondition(cond, offset, limit).getList(), position);
     }
 
+
+
     @Override
     public int del(Shop shop) {
         return super.updateByPrimaryKeySelective(shop);
     }
 
-    /**
-     * 商铺逾期 15 天 自动冻结
-     */
+
+
+
     @Override
     public void autoFreeze() {
         Condition condition = new Condition(Shop.class);
-        condition.createCriteria().andLessThan(" TIMESTAMPDIFF(day, now(), endTime)", -OtherConfig.SHOP_OVERDUE);
+        condition.createCriteria().andLessThan(" TIMESTAMPDIFF(day, now(), endTime)", -Config.SHOP_OVERDUE);
         List<Shop> shops = super.selectListByCondition(condition);
         if (shops != null && !shops.isEmpty()) {
             shops.forEach(shop -> {
@@ -174,7 +176,6 @@ public class ShopServiceImpl extends BaseServiceImpl<Shop> implements ShopServic
 
     /**
      * 查询条件
-     *
      * @param pj
      * @return
      */

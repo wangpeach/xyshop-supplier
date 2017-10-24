@@ -1,7 +1,7 @@
 package com.xy.services.impl;
 
 import com.github.pagehelper.PageInfo;
-import com.xy.config.OtherConfig;
+import com.xy.config.Config;
 import com.xy.config.ResourcesConfig;
 import com.xy.models.UnionGoods;
 import com.xy.services.UnionGoodService;
@@ -29,7 +29,7 @@ public class UnionGoodServiceImpl extends BaseServiceImpl<UnionGoods> implements
     public int saveSelective(UnionGoods entity) {
         entity = this.handleInfo(entity);
         entity.setUuid(StringUtils.getUuid());
-        entity.setGoodNo(OtherConfig.GOOD_PREFIX + RandomUtil.getRandom(12, RandomUtil.TYPE.NUMBER));
+        entity.setGoodNo(Config.GOOD_PREFIX + RandomUtil.getRandom(12, RandomUtil.TYPE.NUMBER));
         entity.setAddTime(DateUtils.getCurrentDate());
         entity.setStatus("wait");
         return super.saveSelective(entity);

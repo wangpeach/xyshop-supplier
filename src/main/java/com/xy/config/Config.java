@@ -1,6 +1,11 @@
 package com.xy.config;
 
-public class OtherConfig {
+public class Config {
+
+    /**
+     * 官方标识
+     */
+    public static final String lord = "lord";
 
     /**
      * 商品编号前缀
