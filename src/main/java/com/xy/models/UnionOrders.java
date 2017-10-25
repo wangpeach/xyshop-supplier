@@ -97,6 +97,9 @@ public class UnionOrders {
      */
     private String coupon;
 
+    @Column(name = "sys_tips")
+    private String sysTips;
+
     /**
      * 优惠金额
      */
@@ -403,5 +406,13 @@ public class UnionOrders {
      */
     public void setPreferentialPrice(String preferentialPrice) {
         this.preferentialPrice = preferentialPrice;
+    }
+
+    public String getSysTips() {
+        return sysTips;
+    }
+
+    public void setSysTips(String sysTips) {
+        this.sysTips = sysTips;
     }
 }

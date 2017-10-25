@@ -64,12 +64,13 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
             // 密码串码, 用户到店核销
             order.setCardCode(StringUtils.splitWithChar(RandomUtil.getRandom(17, RandomUtil.TYPE.NUMBER), 4, ' '));
 
-            if(StringUtils.isNotNull(order.getCoupon())) {
 
+            if (StringUtils.isNotNull(order.getCoupon())) {
+                UserCoupon userCoupon = couponService.selectOnlyByKey(order.getCoupon());
+                order = this.cprole(order, userCoupon.getCoupon());
             } else {
                 order = this.implicitCoupon(user, shop, order);
             }
-
 
             // 实际支付金额
             order.setPayPrice(BigDecimal.valueOf(0));
@@ -77,8 +78,7 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
             // 用户支付后更改支付方式
             order.setPayWay(null);
 
-//            return super.saveSelective(order);
-            return 0;
+            return super.saveSelective(order);
         } else {
             // 参数不完整
             return -1;
@@ -87,56 +87,70 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
 
     /**
      * 查询隐式优惠卷
+     * 商户处于活动期并且该订单有可用的商户优惠卷，则使用商户的优惠卷。否则使用系统发放的优惠卷
      *
      * @param user
      * @param shop
      * @param order
      */
     private UnionOrders implicitCoupon(User user, Shop shop, UnionOrders order) {
-        // 官方和商品创建的优惠卷合并
-        List<Coupon> couponList = new ArrayList<>();
-
+        Coupon coupon = null;
         // 如果商户处于促销活动期间，则查询商户发布的优惠卷信息
         if (shop.isActive()) {
-            Coupon shopCoupon = couponService.selectShopByOrder(user, shop, order);
-            // TODO: 2017/10/24 当前优惠卷使用量已经+1，并且已经处理了商户是否处于活动期， 接下来去要做的是对当前优惠卷使用规则区分
-            switch (shopCoupon.getRule()) {
-                case "recoupon":
-                    // 返券，需要等用户消费成功才可以发放优惠卷
-                    break;
+            // 查询满足使用条件的优惠卷
+            coupon = couponService.selectShopByOrder(user, shop, order);
+            if (coupon != null) {
+                order.setSysTips(coupon.getName());
+            }
+        }
+        // 该订单无法使用商户发布的优惠卷
+        if (coupon == null) {
+            //查询满足使用条件的官方优惠卷
+            coupon = couponService.selectOfficialByOrder(user, order);
+            if (coupon != null) {
+                order.setSysTips(coupon.getName());
+            }
+        }
+
+        // 应支付金额
+        order = this.cprole(order, coupon);
+        order.setCoupon(coupon.getUuid());
+        order.setPreferentialPrice(coupon.getRuleValue());
+        return order;
+    }
+
+
+    /**
+     * 计算订单应支付金额
+     *
+     * @param order
+     * @param coupon
+     * @return
+     */
+    private UnionOrders cprole(UnionOrders order, Coupon coupon) {
+        if (coupon != null) {
+            order.setSysTips(coupon.getName());
+            // 支付金额
+            BigDecimal payAmount = BigDecimal.ZERO;
+            BigDecimal discount = new BigDecimal(coupon.getRuleValue());
+            switch (coupon.getRule()) {
                 case "discount":
                     // 折扣
-                    BigDecimal discount = new BigDecimal(shopCoupon.getRuleValue());
                     discount = discount.divide(BigDecimal.valueOf(100));
                     // 应付金额
-                    order.setPayPrice(order.getTotalPrice().subtract(order.getTotalPrice().multiply(discount)));
+                    payAmount = order.getTotalPrice().subtract(order.getTotalPrice().multiply(discount));
                     break;
                 case "fulldown":
                     // 满减
-
+                    payAmount = order.getTotalPrice().subtract(discount);
                     break;
                 default:
+                    // recoupon 返券，需要等用户消费成功才可以发放优惠卷
+                    payAmount = order.getTotalPrice();
                     break;
             }
-
-            couponList.add(shopCoupon);
-            // TODO: 2017/10/23
-
+            order.setPayPrice(payAmount);
         }
-
-        //查询满足使用条件的官方优惠卷
-        Coupon offCoupon = couponService.selectOfficialByOrder(user, order);
-        couponList.add(offCoupon);
-        if (offCoupon != null) {
-            order.setCoupon(offCoupon.getUuid());
-            order.setPreferentialPrice(offCoupon.getRuleValue());
-        }
-
-
-        String cpstr = org.apache.commons.lang3.StringUtils.join(couponList.stream().map(Coupon::getUuid).toArray(), "|");
-
-        System.out.println(cpstr);
-
         return order;
     }
 }

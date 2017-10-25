@@ -41,7 +41,16 @@ public class UserCouponServiceImpl extends BaseServiceImpl<UserCoupon> implement
 
 
     @Override
-    public UserCoupon selectList(String userId, String shopId, String goodTypeId, String goodId) {
+    public UserCoupon selectOnlyByKey(Object key) {
+        UserCoupon userCoupon = new UserCoupon();
+        userCoupon.setCouponid(key.toString());
+        userCoupon = super.selectOnly(userCoupon);
+        userCoupon.setCoupon(couponService.selectOnlyByKey(key));
+        return userCoupon;
+    }
+
+    @Override
+    public List<UserCoupon> selectList(String userId, String shopId, String goodTypeId, String goodId) {
         UserCoupon userCoupon = new UserCoupon();
         userCoupon.setUserid(userId);
         userCoupon.setStatus("waituser");
@@ -49,10 +58,9 @@ public class UserCouponServiceImpl extends BaseServiceImpl<UserCoupon> implement
         for (UserCoupon item : coupons) {
             Coupon other = couponService.selectOnlyByKey(item.getCouponid());
             // TODO: 2017/10/16 根据参数判断该订单是否可用优惠卷
-
             item.setCoupon(other);
         }
-        return null;
+        return coupons;
     }
 
 

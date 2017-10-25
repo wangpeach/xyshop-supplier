@@ -5,6 +5,7 @@ import com.xy.models.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public interface UserCouponService extends BaseService<UserCoupon> {
 
@@ -16,7 +17,7 @@ public interface UserCouponService extends BaseService<UserCoupon> {
      * @param goodId 该商品拥有的优惠卷
      * @return
      */
-    UserCoupon selectList(@NotNull String userId, String shopId, String goodTypeId, String goodId);
+    List<UserCoupon> selectList(@NotNull String userId, String shopId, String goodTypeId, String goodId);
 
     /**
      * 处理过期的优惠卷，自动过期
