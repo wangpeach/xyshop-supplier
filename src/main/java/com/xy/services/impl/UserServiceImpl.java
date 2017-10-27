@@ -46,9 +46,13 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
         return this.handleResult(super.selectOnlyByKey(key));
     }
 
+
     @Override
     public User selectOnly(User entity) {
-        return this.handleResult(super.selectOnly(entity));
+        Condition cond = new Condition(User.class);
+        Example.Criteria cri = cond.createCriteria();
+        cri.andEqualTo("phoneNum", entity.getPhoneNum()).andEqualTo("password", entity.getPassword());
+        return this.handleResult(super.selectOnly(cond, 0));
     }
 
     @Override
@@ -73,7 +77,9 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
 
     @Override
     public User handleResult(User arg) {
-        arg.setHeadImg(ResourcesConfig.HEADURL + arg.getHeadImg());
+        if(arg != null) {
+            arg.setHeadImg(ResourcesConfig.HEADURL + arg.getHeadImg());
+        }
         return arg;
     }
 }

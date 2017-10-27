@@ -5,9 +5,11 @@ import com.github.pagehelper.PageInfo;
 import com.xy.config.ResourcesConfig;
 import com.xy.models.Ad;
 import com.xy.models.User;
+import com.xy.models.UserCollect;
 import com.xy.models.UserCoupon;
 import com.xy.pojo.ParamsPojo;
 import com.xy.services.AdService;
+import com.xy.services.UserCollectService;
 import com.xy.services.UserCouponService;
 import com.xy.services.UserService;
 import com.xy.utils.*;
@@ -21,7 +23,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by rjora on 2017/6/29 0029.
+ * UserController
+ * @author Administrator
+ * @date 2017/10/27 17:30
+ * @description
  */
 @Scope("prototype")
 @Controller
@@ -35,7 +40,7 @@ public class UserController {
     private AdService adService;
 
     @Autowired
-    private UserCouponService userCouponService;
+    private UserCollectService collectService;
 
     @ResponseBody
     @RequestMapping(value = "mapi/login")
@@ -147,6 +152,7 @@ public class UserController {
 
     /**
      * 修改用户信息
+     *
      * @param user
      * @return
      */
@@ -161,6 +167,7 @@ public class UserController {
 
     /**
      * 用户详情
+     *
      * @param uuid
      * @return
      */
@@ -172,15 +179,26 @@ public class UserController {
     }
 
 
+    @ResponseBody
+    @RequestMapping("mapi/collects")
+    public List<UserCollect> collects(@RequestParam String user) {
+        UserCollect collect = new UserCollect();
+        collect.setUserUuid(user);
+        return collectService.selectList(collect);
+    }
+
+
     /**
      * 优惠卷
      * @return
      */
-    @ResponseBody
-    @RequestMapping("coupons")
-    public List coupons(@RequestParam String user, @RequestParam String shop, @RequestParam String good) {
-        UserCoupon coupon = new UserCoupon();
-        coupon.setUserid(user);
-        return userCouponService.selectList(coupon);
-    }
+//    @ResponseBody
+//    @RequestMapping("coupons")
+//    public List coupons(@RequestParam String user, @RequestParam String shop, @RequestParam String good) {
+//        UserCoupon coupon = new UserCoupon();
+//        coupon.setUserid(user);
+//        return userCouponService.selectList(coupon);
+//    }
+
+
 }

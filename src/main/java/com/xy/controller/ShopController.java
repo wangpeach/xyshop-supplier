@@ -64,7 +64,7 @@ public class ShopController {
             shop.setPassword(Md5Util.md5UpperCase(pwd));
             shop = shopService.selectOnly(shop);
             if (shop != null) {
-                if("freeze".equals(shop.getStatus())) {
+                if ("freeze".equals(shop.getStatus())) {
                     res = "freeze";
                 } else {
                     logService.addLog(shop.getUuid(), shop.getName(), IpUtils.getIp(request), Logs.login_success, "登录", "商铺登录成功");
@@ -111,7 +111,7 @@ public class ShopController {
             condition.createCriteria().andEqualTo("userUuid", shop.getUuid()).andEqualTo("key", Logs.login_success);
             Logs log = logService.selectOnly(condition, 2);
 
-            if(log != null) {
+            if (log != null) {
                 view.addObject("end", end);
                 view.addObject("lastTime", log.getAddtime());
             }
@@ -125,6 +125,7 @@ public class ShopController {
 
     /**
      * 商铺 首页信息
+     *
      * @return
      */
     @RequestMapping(value = "wallet-info")
@@ -159,18 +160,19 @@ public class ShopController {
     @RequestMapping(value = "list")
     public List<Shop> list(@ModelAttribute Shop shop) {
         Condition cond = new Condition(Shop.class);
-        cond.createCriteria().andLike("name", "%"+ shop.getName() +"%").andEqualTo("status");
+        cond.createCriteria().andLike("name", "%" + shop.getName() + "%").andEqualTo("status");
         return shopService.selectListByCondition(cond);
     }
 
 
     /**
      * 客户端搜索商10家
-     * @param cates 分类
+     *
+     * @param cates    分类
      * @param key
      * @param position 用户坐标
      * @param distance 搜索周围距离
-     * @param orderBy 排序方式
+     * @param orderBy  排序方式
      * @return
      */
     @PostMapping("mapi/list")
@@ -178,33 +180,39 @@ public class ShopController {
         return shopService.mApiList(cates, key, position, distance, orderBy, offset, Config.LIMIT);
     }
 
-    @RequestMapping(value = {"only", "mapi/only"})
-    public @ResponseBody Shop only(@ModelAttribute Shop shop) {
+    @ResponseBody
+    @RequestMapping(value = {"only"})
+    public Shop only(@ModelAttribute Shop shop) {
         shop.setStatus("online");
         return shopService.selectOnly(shop);
     }
 
+    @RequestMapping("mapi/only")
+    public Shop only(@RequestParam String uuid) {
+       return shopService.selectOnlyByKey(uuid);
+    }
+
     /**
-     *
      * @param shop
      * @return
      */
     @RequestMapping(value = "save")
-    public @ResponseBody int save(@ModelAttribute Shop shop) {
+    public @ResponseBody
+    int save(@ModelAttribute Shop shop) {
         return shopService.saveSelective(shop);
     }
 
 
-
     @RequestMapping(value = "update")
-    public @ResponseBody int update(@ModelAttribute Shop shop) {
+    public @ResponseBody
+    int update(@ModelAttribute Shop shop) {
         return shopService.updateByPrimaryKeySelective(shop);
     }
 
 
-
     @RequestMapping(value = "del")
-    public @ResponseBody int delete(@ModelAttribute Shop shop) {
+    public @ResponseBody
+    int delete(@ModelAttribute Shop shop) {
         shop.setStatus("deleted");
         return shopService.del(shop);
     }

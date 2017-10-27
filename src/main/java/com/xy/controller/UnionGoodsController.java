@@ -17,6 +17,12 @@ import tk.mybatis.mapper.util.StringUtil;
 
 import java.util.List;
 
+/**
+ * UnionGoodsController
+ * @author Administrator
+ * @date 2017/10/27 14:56
+ * @description
+ */
 @RestController
 @Scope(value = "prototype")
 @RequestMapping(value = "goods/")
@@ -171,11 +177,11 @@ public class UnionGoodsController {
 
     @ResponseBody
     @RequestMapping(value = {"mapi/list"})
-    public List<UnionGoods> mApiList(@RequestParam String shop, @RequestParam String key, @RequestParam int offset) {
+    public List<UnionGoods> list(@RequestParam String shop, @RequestParam String key, @RequestParam int offset) {
         Condition cond = new Condition(UnionGoods.class);
         Example.Criteria cri = cond.createCriteria();
         if (StringUtils.isNotNull(shop)) {
-            cri.andEqualTo(shop);
+            cri.andEqualTo("shopUuid", shop);
         }
         if (StringUtils.isNotNull(key)) {
             cri.andLike("name", "%" + key + "%");

@@ -33,7 +33,7 @@ public class UserFootprintController {
      * @param user
      */
     @RequestMapping("mapi/addfoot")
-    public void mapiUserFoot(@RequestParam String good, @RequestParam String user) {
+    public void save(@RequestParam String good, @RequestParam String user) {
         UserFootprint foot = null;
         Condition cond = new Condition(UserFootprint.class);
         cond.createCriteria().andEqualTo("goodUuid", good).andEqualTo("userUuid", user);

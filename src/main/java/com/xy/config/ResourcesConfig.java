@@ -16,58 +16,79 @@ public class ResourcesConfig implements EnvironmentAware {
 
     private Environment env;
 
-    // 系统真实路径
+    /**
+     * 系统真实路径
+     */
     public static final String SYSTEM_PATH = System.getProperty("evan.xyslr");
 
 
-
-
-
-    //文件临时保存路径
+    /**
+     * 文件临时保存路径
+     */
     public static String FILETEMP;
     public static String REQTEMP;
 
     public static String SHOPPATH;
     public static String SHOPURL;
 
-    // 图标保存路径
+    /**
+     * 图标保存路径
+     */
     public static String ICONPATH;
     public static String ICONURL;
 
-    // 头像保存路径
+    /**
+     * 头像保存路径
+     */
     public static String HEADPATH;
     public static String HEADURL;
 
-    // 产品图片保存路径
+    /**
+     * 产品图片保存路径
+     */
     public static String PRODUCTIMGPATH;
     public static String PRODUCTIMGURL;
 
-    // 评论图片保存路径
+    /**
+     * 评论图片保存路径
+     */
     public static String JUDGEIMGPATH;
     public static String JUDGEIMGURL;
 
-    // app 相关图片资源路径
+    /**
+     * app 相关图片资源路径
+     */
     public static String APPPATH;
     public static String APPURL;
 
-    // 广告相关图片
+    /**
+     * 广告相关图片
+     */
     public static String ADVIMGPATH;
     public static String ADVIMGURL;
 
-    // 广告相关视频
+    /**
+     * 广告相关视频
+     */
     public static String ADVIDEOPATH;
     public static String ADVIDEOURL;
 
 
-    // 商铺详情文件
+    /**
+     * 商铺详情文件
+     */
     public static String DESSHOPPATH;
     public static String DESSHOPURL;
 
-    // 商品详情文件
+    /**
+     * 商品详情文件
+     */
     public static String DESGOODSPATH;
     public static String DESGOODSURL;
 
-    // 广告详情文件
+    /**
+     * 广告详情文件
+     */
     public static String DESADPATH;
     public static String DESADURL;
 

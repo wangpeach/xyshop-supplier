@@ -16,6 +16,7 @@ import tk.mybatis.mapper.entity.Condition;
 import tk.mybatis.mapper.entity.Example;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,18 +50,39 @@ public class UserCouponServiceImpl extends BaseServiceImpl<UserCoupon> implement
         return userCoupon;
     }
 
+
     @Override
-    public List<UserCoupon> selectList(String userId, String shopId, String goodTypeId, String goodId) {
+    public List<UserCoupon> selectList(String userId, String shopId, String cate, String goodId) {
         UserCoupon userCoupon = new UserCoupon();
         userCoupon.setUserid(userId);
         userCoupon.setStatus("waituser");
-        List<UserCoupon> coupons = super.selectList(userCoupon);
-        for (UserCoupon item : coupons) {
-            Coupon other = couponService.selectOnlyByKey(item.getCouponid());
-            // TODO: 2017/10/16 根据参数判断该订单是否可用优惠卷
-            item.setCoupon(other);
+
+        List<UserCoupon> result = new ArrayList<>();
+
+        List<UserCoupon> userCoupons = super.selectList(userCoupon);
+
+        if(userCoupons != null && userCoupons.size() > 0) {
+            // 查询优惠卷信息
+            Condition cond = new Condition(Coupon.class);
+            cond.createCriteria().andIn("uuid", userCoupons.stream().map(UserCoupon::getCoupon).collect(Collectors.toList()));
+            List<Coupon> coupons = couponService.selectListByCondition(cond);
+
+
+            for (UserCoupon item : userCoupons) {
+                Coupon coupon = coupons.stream().filter(arg -> arg.getUuid().equals(item.getCoupon())).collect(Collectors.toList()).get(0);
+                item.setCoupon(coupon);
+                // 根据参数判断该订单是否可用优惠卷
+                boolean legal = (coupon.getToGoods().equals("good") && coupon.getToGoodsValue().equals(goodId)) || (coupon.getToGoods().equals("cate") && coupon.getToGoodsValue().equals(cate)) || coupon.getToGoods().equals("all");
+                if(legal) {
+                    legal = StringUtils.isNull(shopId) || (StringUtils.isNotNull(shopId) && coupon.getAuthor().equals(shopId));
+                    if (legal) {
+                        result.add(item);
+                        break;
+                    }
+                }
+            }
         }
-        return coupons;
+        return userCoupons;
     }
 
 
