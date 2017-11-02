@@ -3,6 +3,7 @@ package com.xy.models;
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.math.BigDecimal;
 
 @Table(name = "union_orders")
@@ -105,6 +106,18 @@ public class UnionOrders {
      */
     @Column(name = "preferential_price")
     private String preferentialPrice;
+
+    /**
+     * 外部支付编号 支付宝，微信
+     */
+    @Column(name = "out_trade_no")
+    private String outTradeNo;
+
+    @Transient
+    private UnionGoods good;
+
+    @Transient
+    private String textStatus;
 
     /**
      * @return uuid
@@ -414,5 +427,29 @@ public class UnionOrders {
 
     public void setSysTips(String sysTips) {
         this.sysTips = sysTips;
+    }
+
+    public UnionGoods getGood() {
+        return good;
+    }
+
+    public void setGood(UnionGoods good) {
+        this.good = good;
+    }
+
+    public String getTextStatus() {
+        return textStatus;
+    }
+
+    public void setTextStatus(String textStatus) {
+        this.textStatus = textStatus;
+    }
+
+    public String getOutTradeNo() {
+        return outTradeNo;
+    }
+
+    public void setOutTradeNo(String outTradeNo) {
+        this.outTradeNo = outTradeNo;
     }
 }

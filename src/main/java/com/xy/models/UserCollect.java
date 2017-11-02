@@ -41,6 +41,8 @@ public class UserCollect {
     @Column(name = "add_time")
     private String addTime;
 
+    private String status;
+
     /**
      * @return uuid
      */
@@ -161,5 +163,13 @@ public class UserCollect {
      */
     public void setAddTime(String addTime) {
         this.addTime = addTime == null ? null : addTime.trim();
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

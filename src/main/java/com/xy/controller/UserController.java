@@ -125,8 +125,10 @@ public class UserController {
         Ad m_ad = adService.selectOnlyByKey(ad);
         if (m_ad != null && user != null) {
             if (StringUtils.isNotNull(m_ad.getCoin())) {
-                m_user.setCoin(m_user.getCoin().add(m_ad.getCoin()));
-                userService.updateByPrimaryKeySelective(m_user);
+                User other = new User();
+                other.setUuid(m_user.getUuid());
+                other.setCoin(m_user.getCoin().add(m_ad.getCoin()));
+                userService.updateByPrimaryKeySelective(other);
                 jsonVo.setData(m_user.getCoin());
             }
         } else {
@@ -178,14 +180,6 @@ public class UserController {
         return null;
     }
 
-
-    @ResponseBody
-    @RequestMapping("mapi/collects")
-    public List<UserCollect> collects(@RequestParam String user) {
-        UserCollect collect = new UserCollect();
-        collect.setUserUuid(user);
-        return collectService.selectList(collect);
-    }
 
 
     /**

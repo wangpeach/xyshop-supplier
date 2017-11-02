@@ -177,7 +177,11 @@ public class UserCouponServiceImpl extends BaseServiceImpl<UserCoupon> implement
      */
     private Coupon filter(List<Coupon> coupons, BigDecimal money, String toUser) {
         // 过滤出所有符合 消费金额，用户类型的优惠卷
-        return coupons.stream().filter(coupon -> toUser.equals(coupon.getToUser()) && money.compareTo(BigDecimal.valueOf(coupon.getToUserValue())) > -1).sorted(Comparator.comparing(Coupon::getToUserValue)).collect(Collectors.toList()).get(0);
+        List<Coupon> others = coupons.stream().filter(coupon -> toUser.equals(coupon.getToUser()) && money.compareTo(BigDecimal.valueOf(coupon.getToUserValue())) > -1).sorted(Comparator.comparing(Coupon::getToUserValue)).collect(Collectors.toList());
+        if(others != null && others.size() > 0) {
+            return others.get(0);
+        }
+        return null;
     }
 
 

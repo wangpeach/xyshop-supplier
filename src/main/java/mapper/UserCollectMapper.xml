@@ -12,5 +12,6 @@
     <result column="thumb_img" jdbcType="VARCHAR" property="thumbImg" />
     <result column="collect_type" jdbcType="CHAR" property="collectType" />
     <result column="add_time" jdbcType="VARCHAR" property="addTime" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
   </resultMap>
 </mapper>

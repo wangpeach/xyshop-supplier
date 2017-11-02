@@ -60,6 +60,8 @@
 		<!--<table tableName="user_coupon" domainObjectName="UserCoupon"></table>-->
 		<!--<table tableName="user_collect" domainObjectName="UserCollect"></table>-->
 		<!--<table tableName="user_footprint" domainObjectName="UserFootprint"></table>-->
-		<table tableName="ad" domainObjectName="Ad"></table>
+		<!--<table tableName="ad" domainObjectName="Ad"></table>-->
+		<table tableName="alipayments" domainObjectName="AliPayments"></table>
+		<table tableName="wxpayments" domainObjectName="WXPayments"></table>
 	</context>
 </generatorConfiguration>

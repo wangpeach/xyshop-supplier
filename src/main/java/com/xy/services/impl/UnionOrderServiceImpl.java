@@ -1,20 +1,23 @@
 package com.xy.services.impl;
 
+import com.github.pagehelper.PageInfo;
+import com.xy.config.AliPay;
 import com.xy.models.*;
 import com.xy.services.*;
 import com.xy.utils.DateUtils;
 import com.xy.utils.RandomUtil;
 import com.xy.utils.StringUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Condition;
-import tk.mybatis.mapper.entity.Example;
 
+import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by rjora on 2017/7/16 0016.
@@ -34,9 +37,51 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
     @Autowired
     private UserCouponService couponService;
 
+    @Autowired
+    private AliPaymentsService aliPaymentsService;
 
     @Override
-    public int saveSelective(String userId, String shopId, String goodId, int num) {
+    public PageInfo<UnionOrders> selectPageInfoByCondition(Condition condition, int offset, int limit) {
+        PageInfo<UnionOrders> orders = super.selectPageInfoByCondition(condition, offset, limit);
+
+        List<String> gids = orders.getList().stream().map(UnionOrders::getGoodsUuid).collect(Collectors.toList());
+        if (gids != null && gids.size() > 0) {
+            Condition cond = new Condition(UnionGoods.class);
+            cond.createCriteria().andIn("uuid", gids);
+            List<UnionGoods> goods = goodService.selectListByCondition(cond);
+            orders.getList().forEach(unionOrders -> {
+                String text = "";
+                switch (unionOrders.getStatus()) {
+                    case "waitPay":
+                        text = "待支付";
+                        break;
+                    case "paySuccess":
+                        text = "支付成功";
+                        break;
+                    case "payFail":
+                        text = "支付失败";
+                        break;
+                    case "waitConsume":
+                        text = "待使用";
+                        break;
+                    case "consumed":
+                        text = "已使用";
+                        break;
+                    default:
+                        text = "已退款";
+                        break;
+                }
+                unionOrders.setTextStatus(text);
+                UnionGoods item = goods.stream().filter(unionGoods -> unionOrders.getGoodsUuid().equals(unionGoods.getUuid())).findAny().get();
+                unionOrders.setGood(item);
+            });
+        }
+        return orders;
+    }
+
+
+    @Override
+    public UnionOrders saveSelective(String userId, String shopId, String goodId, int num, String coupon) {
         UnionOrders order = new UnionOrders();
 
         User user = userService.selectOnlyByKey(userId);
@@ -47,6 +92,9 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
         UnionGoods good = goodService.selectOnly(entity);
 
         if (good != null && shop != null && good != null) {
+
+            order.setCoupon(coupon);
+
             order.setUuid(StringUtils.getUuid());
             order.setAddTime(DateUtils.getCurrentDate());
 
@@ -62,7 +110,7 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
             // 订单总金额，应付金额
             order.setTotalPrice(good.getPrice().multiply(BigDecimal.valueOf(num)));
             // 密码串码, 用户到店核销
-            order.setCardCode(StringUtils.splitWithChar(RandomUtil.getRandom(17, RandomUtil.TYPE.NUMBER), 4, ' '));
+            order.setCardCode(StringUtils.splitWithChar(RandomUtil.getRandom(12, RandomUtil.TYPE.NUMBER), 4, ' '));
 
 
             if (StringUtils.isNotNull(order.getCoupon())) {
@@ -72,18 +120,16 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
                 order = this.implicitCoupon(user, shop, order);
             }
 
-            // 实际支付金额
-            order.setPayPrice(BigDecimal.valueOf(0));
-
             // 用户支付后更改支付方式
             order.setPayWay(null);
 
-            return super.saveSelective(order);
-        } else {
-            // 参数不完整
-            return -1;
+            if (super.saveSelective(order) > 0) {
+                return order;
+            }
         }
+        return null;
     }
+
 
     /**
      * 查询隐式优惠卷
@@ -114,8 +160,6 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
 
         // 应支付金额
         order = this.cprole(order, coupon);
-        order.setCoupon(coupon.getUuid());
-        order.setPreferentialPrice(coupon.getRuleValue());
         return order;
     }
 
@@ -128,10 +172,11 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
      * @return
      */
     private UnionOrders cprole(UnionOrders order, Coupon coupon) {
+        // 支付金额
+        BigDecimal payAmount = BigDecimal.ZERO;
         if (coupon != null) {
             order.setSysTips(coupon.getName());
-            // 支付金额
-            BigDecimal payAmount = BigDecimal.ZERO;
+
             BigDecimal discount = new BigDecimal(coupon.getRuleValue());
             switch (coupon.getRule()) {
                 case "discount":
@@ -149,8 +194,76 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
                     payAmount = order.getTotalPrice();
                     break;
             }
-            order.setPayPrice(payAmount);
+            order.setCoupon(coupon.getUuid());
+            order.setPreferentialPrice(coupon.getRuleValue());
+        } else {
+            payAmount = order.getTotalPrice();
         }
+        order.setPayPrice(payAmount);
         return order;
+    }
+
+
+    @Override
+    public String payment(String orderUuid, String paywhy) {
+        String result = null;
+        UnionOrders order = super.selectOnlyByKey(orderUuid);
+        UnionGoods good = goodService.selectOnlyByKey(order.getGoodsUuid());
+        switch (paywhy) {
+            case "wxpay":
+                break;
+            case "alpay":
+                result = AliPay.getInstance().createOrderString(order.getOrderNo(), good.getName(), order.getShopName() + ":" + order.getOrderNo(), order.getPayPrice().toString(), order.getUserUuid());
+                break;
+            case "gold":
+                break;
+            default:
+                result = "error:支付类型无效";
+                break;
+        }
+        return result;
+    }
+
+
+    @Override
+    public String aliReceiveNotify(HttpServletRequest request) {
+        String result = "error";
+        Map<String, String> params = new HashMap<>();
+        Map requestParams = request.getParameterMap();
+        for (Iterator iter = requestParams.keySet().iterator(); iter.hasNext(); ) {
+            String name = (String) iter.next();
+            String[] values = (String[]) requestParams.get(name);
+            String valueStr = "";
+            for (int i = 0; i < values.length; i++) {
+                valueStr = (i == values.length - 1) ? valueStr + values[i]
+                        : valueStr + values[i] + ",";
+            }
+            //乱码解决，这段代码在出现乱码时使用。
+            //valueStr = new String(valueStr.getBytes("ISO-8859-1"), "utf-8");
+            params.put(name, valueStr);
+        }
+        boolean flag = AliPay.getInstance().rsaCheck(params);
+        if (flag) {
+            AliPayments payments = new AliPayments(params);
+
+            String finished = "TRADE_FINISHED", success = "TRADE_SUCCESS";
+            if (success.equals(payments.getTradeStatus()) || finished.equals(payments.getTradeStatus())) {
+                payments.getOutTradeNo();
+                UnionOrders order = new UnionOrders();
+                order.setOrderNo(payments.getOutTradeNo());
+                // 签名支付信息时 传入了自定义信息，携带了用户uuid，所以在这里可以取到
+                order.setUserUuid(payments.getPassbackParams());
+                order = super.selectOnly(order);
+                // 验证支付金额是否于订单金额相等，和是否为商户本身(对于支付宝角度而言)
+                if (order.getPayPrice().compareTo(new BigDecimal(payments.getTotalAmount())) == 0 && payments.getAppId().equals(AliPay.ali_appid)) {
+                    order.setStatus("waitConsume");
+                    order.setPayWay("alipay");
+                    super.updateByPrimaryKeySelective(order);
+                    aliPaymentsService.saveSelective(payments);
+                    result = "success";
+                }
+            }
+        }
+        return result;
     }
 }

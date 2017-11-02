@@ -23,5 +23,6 @@
     <result column="coupon" jdbcType="VARCHAR" property="coupon" />
     <result column="preferential_price" jdbcType="VARCHAR" property="preferentialPrice" />
     <result column="sys_tips" jdbcType="VARCHAR" property="sysTips" />
+    <result column="out_trade_no" jdbcType="VARCHAR" property="outTradeNo" />
   </resultMap>
 </mapper>
