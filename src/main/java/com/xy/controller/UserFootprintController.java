@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import tk.mybatis.mapper.entity.Condition;
 
+import java.util.List;
+
 @Scope("prototype")
 @RestController
 @RequestMapping("userfoot/")
@@ -29,6 +31,7 @@ public class UserFootprintController {
 
     /**
      * 用户浏览足迹
+     *
      * @param good
      * @param user
      */
@@ -38,7 +41,7 @@ public class UserFootprintController {
         Condition cond = new Condition(UserFootprint.class);
         cond.createCriteria().andEqualTo("goodUuid", good).andEqualTo("userUuid", user);
         foot = userFootprintService.selectOnly(cond, 0);
-        if(foot != null) {
+        if (foot != null) {
             foot.setAddTime(DateUtils.getCurrentDate());
             userFootprintService.updateByPrimaryKeySelective(foot);
         } else {
@@ -56,10 +59,8 @@ public class UserFootprintController {
 
     @ResponseBody
     @RequestMapping("mapi/list")
-    public PageInfo<UserFootprint> list(@RequestParam String user, @RequestParam int offset){
-        UserFootprint foot = new UserFootprint();
-        foot.setUserUuid(user);
-        return userFootprintService.selectPageInfo(foot, offset, Config.LIMIT);
+    public List<UserFootprint> list(@RequestParam String user, @RequestParam int offset) {
+        return userFootprintService.selectList(user, offset, Config.LIMIT);
     }
 }
 

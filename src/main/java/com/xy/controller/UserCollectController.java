@@ -57,4 +57,12 @@ public class UserCollectController {
     }
 
 
+    @ResponseBody
+    @RequestMapping(value="mapi/del", produces = "application/text")
+    public String del(@RequestParam String key) {
+        if(StringUtils.isNotNull(key) && collectService.deleteByPrimaryKey(key) > 0) {
+            return "success";
+        }
+        return "error";
+    }
 }

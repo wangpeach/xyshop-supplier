@@ -32,7 +32,7 @@
     <result column="visual" jdbcType="BIT" property="visual" />
     <result column="freeze" jdbcType="BIT" property="freeze" />
     <result column="open_audit" jdbcType="BIT" property="openAudit" />
-    <result column="scale" jdbcType="VARCHAR" property="scale" />
+    <result column="scale" jdbcType="DECIMAL" property="scale" />
     <result column="endTime" jdbcType="VARCHAR" property="endtime" />
     <result column="shop_detail" jdbcType="LONGVARCHAR" property="shopDetail" />
     <result column="active" jdbcType="TINYINT" property="active" />

@@ -3,6 +3,8 @@ package com.xy.models;
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+import java.math.BigDecimal;
 
 @Table(name = "system_params")
 public class SystemParams {
@@ -29,6 +31,17 @@ public class SystemParams {
      * (分佣类型:  下级会员购买自营产品:recharge,  下级会员线下买单:customer_md,  下级商家收单(会员通过买单支付):shop_sd),  (用户提现:withdraw, 商家买单提现:shopwhthdraw)
      */
     private String type;
+
+    @Transient
+    private BigDecimal decValue;
+
+    public BigDecimal getDecValue() {
+        return decValue;
+    }
+
+    public void setDecValue(BigDecimal decValue) {
+        this.decValue = decValue;
+    }
 
     /**
      * @return uuid

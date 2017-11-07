@@ -210,6 +210,15 @@ public class ShopController {
     }
 
 
+    @RequestMapping("modify")
+    public String modify(@ModelAttribute Shop shop) {
+        if(shopService.modifyShopByKeySelective(shop) > 0) {
+            return "success";
+        }
+        return "error";
+    }
+
+
     @RequestMapping(value = "del")
     public @ResponseBody
     int delete(@ModelAttribute Shop shop) {

@@ -56,7 +56,10 @@ public class UnionGoodServiceImpl extends BaseServiceImpl<UnionGoods> implements
     }
 
 
-
+    @Override
+    public int updateOnlineGood(UnionGoods arg) {
+        return super.updateByPrimaryKeySelective(arg);
+    }
 
     /**
      * 处理商品数据

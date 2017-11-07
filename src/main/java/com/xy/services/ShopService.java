@@ -28,4 +28,6 @@ public interface ShopService extends BaseService<Shop> {
      * @return
      */
     List<Shop> mApiList(String cats, String key, String position, String distance, String orderBy, int offset, int limit);
+
+    int modifyShopByKeySelective(Shop shop);
 }

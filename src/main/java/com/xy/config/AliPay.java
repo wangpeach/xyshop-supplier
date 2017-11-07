@@ -32,7 +32,7 @@ public class AliPay {
 
     private static final String timeout = "1d";
 
-    private static final String notifyUrl = "order/ali_receive_notify";
+    private static final String notifyUrl = "http://219.141.127.213:8087/xyshop-supplier/order/ali_receive_notify";
 
     private AlipayClient client = null;
 

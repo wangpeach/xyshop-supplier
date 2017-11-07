@@ -139,7 +139,7 @@ public class Shop {
     /**
      * 整单买单折扣比例
      */
-    private String scale;
+    private BigDecimal scale;
 
     /**
      * 合同到期时间
@@ -601,7 +601,7 @@ public class Shop {
      *
      * @return scale - 整单买单折扣比例
      */
-    public String getScale() {
+    public BigDecimal getScale() {
         return scale;
     }
 
@@ -610,8 +610,8 @@ public class Shop {
      *
      * @param scale 整单买单折扣比例
      */
-    public void setScale(String scale) {
-        this.scale = scale == null ? null : scale.trim();
+    public void setScale(BigDecimal scale) {
+        this.scale = scale;
     }
 
     /**

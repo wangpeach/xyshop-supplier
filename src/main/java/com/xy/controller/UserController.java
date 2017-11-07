@@ -179,20 +179,4 @@ public class UserController {
 
         return null;
     }
-
-
-
-    /**
-     * 优惠卷
-     * @return
-     */
-//    @ResponseBody
-//    @RequestMapping("coupons")
-//    public List coupons(@RequestParam String user, @RequestParam String shop, @RequestParam String good) {
-//        UserCoupon coupon = new UserCoupon();
-//        coupon.setUserid(user);
-//        return userCouponService.selectList(coupon);
-//    }
-
-
 }

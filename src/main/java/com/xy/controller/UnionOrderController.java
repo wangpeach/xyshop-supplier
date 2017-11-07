@@ -90,21 +90,12 @@ public class UnionOrderController {
      * 支付
      *
      * @param order  订单 uuid
-     * @param paywhy 支付方式
      * @return
      */
-    @RequestMapping(value = "mapi/payment", produces = "application/text")
-    public String payment(@RequestParam String order, @RequestParam String paywhy) {
-        return orderService.payment(order, paywhy);
-    }
-
-    @RequestMapping(value = "mapi/check-paysuc", produces = "application/text")
-    public String checkOrder(@RequestParam String key) {
-        UnionOrders order = orderService.selectOnlyByKey(key);
-        if ("waitConsume".equals(order.getStatus())) {
-            return "success";
-        }
-        return "fail";
+    @ResponseBody
+    @RequestMapping(value = "mapi/ali-payment", produces = "application/text")
+    public String aliPayment(@RequestParam String order) {
+        return orderService.aliPayment(order);
     }
 
     /**
@@ -125,6 +116,19 @@ public class UnionOrderController {
         }
     }
 
+
+    /**
+     * 微信支付签名
+     * @param order
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "mapi/wx-payment", produces = "application/text")
+    public String wxPayment(@RequestParam String order) {
+        return orderService.wxPayment(order);
+    }
+
+
     /**
      * 微信异步回调通知
      *
@@ -133,5 +137,25 @@ public class UnionOrderController {
     @RequestMapping("wx_receive_notify")
     public void wxReceiveNotify(HttpServletRequest request, HttpServletResponse response) {
 
+    }
+
+
+    @RequestMapping(value = "mapi/coin-payment")
+    public Map<String, Object> coinPayment(@RequestParam String order) {
+        return orderService.coinPayment(order);
+    }
+
+    /**
+     * 检查订单是否支付成功
+     * @param key
+     * @return
+     */
+    @RequestMapping(value = "mapi/check-paysuc", produces = "application/text")
+    public String checkOrder(@RequestParam String key) {
+        UnionOrders order = orderService.selectOnlyByKey(key);
+        if ("waitConsume".equals(order.getStatus())) {
+            return "success";
+        }
+        return "fail";
     }
 }

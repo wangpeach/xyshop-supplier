@@ -43,6 +43,17 @@ public class UserCollect {
 
     private String status;
 
+    @Transient
+    private String showThumbImg;
+
+    public String getShowThumbImg() {
+        return showThumbImg;
+    }
+
+    public void setShowThumbImg(String showThumbImg) {
+        this.showThumbImg = showThumbImg;
+    }
+
     /**
      * @return uuid
      */

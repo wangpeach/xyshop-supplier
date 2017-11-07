@@ -110,7 +110,9 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
             // 订单总金额，应付金额
             order.setTotalPrice(good.getPrice().multiply(BigDecimal.valueOf(num)));
             // 密码串码, 用户到店核销
-            order.setCardCode(StringUtils.splitWithChar(RandomUtil.getRandom(12, RandomUtil.TYPE.NUMBER), 4, ' '));
+            String cordCode = StringUtils.splitWithChar(RandomUtil.getRandom(12, RandomUtil.TYPE.NUMBER), 4, ' ');
+            System.out.println("----------------------------------------------------------------" + cordCode);
+            order.setCardCode(cordCode);
 
 
             if (StringUtils.isNotNull(order.getCoupon())) {
@@ -205,22 +207,11 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
 
 
     @Override
-    public String payment(String orderUuid, String paywhy) {
+    public String aliPayment(String orderUuid) {
         String result = null;
         UnionOrders order = super.selectOnlyByKey(orderUuid);
         UnionGoods good = goodService.selectOnlyByKey(order.getGoodsUuid());
-        switch (paywhy) {
-            case "wxpay":
-                break;
-            case "alpay":
-                result = AliPay.getInstance().createOrderString(order.getOrderNo(), good.getName(), order.getShopName() + ":" + order.getOrderNo(), order.getPayPrice().toString(), order.getUserUuid());
-                break;
-            case "gold":
-                break;
-            default:
-                result = "error:支付类型无效";
-                break;
-        }
+        result = AliPay.getInstance().createOrderString(order.getOrderNo(), good.getName(), order.getShopName() + ":" + order.getOrderNo(), order.getPayPrice().toString(), order.getUserUuid());
         return result;
     }
 
@@ -265,5 +256,63 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
             }
         }
         return result;
+    }
+
+
+    @Override
+    public String wxPayment(String orderUuid) {
+        return null;
+    }
+
+
+    @Override
+    public String wxReceiveNotify(HttpServletRequest request) {
+        return null;
+    }
+
+    @Override
+    public Map<String, Object> coinPayment(String orderUuid) {
+        Map<String, Object> result = new HashMap<>();
+
+        UnionOrders order = super.selectOnlyByKey(orderUuid);
+        User buyer = userService.selectOnlyByKey(order.getUserUuid());
+        if(buyer.getCoin().compareTo(order.getPayPrice()) >= 0) {
+
+            order.setStatus("waitConsume");
+            order.setPayWay("coin");
+
+            int affect = super.updateByPrimaryKeySelective(order);
+            if(affect < 1) {
+                result.put("status", "error");
+                result.put("tips", "出现内部错误");
+                return result;
+            }
+
+            User other = new User();
+            other.setUuid(buyer.getUuid());
+            other.setCoin(buyer.getCoin().subtract(order.getPayPrice()));
+            affect = userService.updateByPrimaryKeySelective(other);
+            if(affect < 1) {
+                if(affect < 1) {
+                    result.put("status", "error");
+                    result.put("tips", "出现内部错误");
+                    return result;
+                }
+            }
+
+            result.put("status", "success");
+            return result;
+        } else {
+            result.put("status", "error");
+            result.put("tips", "金币不足");
+        }
+        return result;
+    }
+
+
+    @Override
+    public String writeOff(String shopUuid, String cardCode) {
+        // TODO: 2017/11/6 核销订单，检查订单是否需要赠送优惠价
+        return null;
     }
 }

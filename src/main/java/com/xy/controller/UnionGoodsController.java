@@ -115,7 +115,7 @@ public class UnionGoodsController {
     @RequestMapping({"resolve", "unfreeze", "up"})
     public int resolveOrUpOrUnFreeze(@ModelAttribute UnionGoods unionGoods) {
         unionGoods.setStatus("online");
-        return goodService.updateByPrimaryKeySelective(unionGoods);
+        return goodService.updateOnlineGood(unionGoods);
     }
 
 

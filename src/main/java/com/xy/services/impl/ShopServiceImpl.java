@@ -5,10 +5,12 @@ import com.xy.config.Config;
 import com.xy.config.ResourcesConfig;
 import com.xy.models.Shop;
 import com.xy.models.ShopWallet;
+import com.xy.models.SystemParams;
 import com.xy.pojo.ParamsPojo;
 import com.xy.services.ShopService;
 import com.xy.services.ShopCategroyService;
 import com.xy.services.ShopWalletService;
+import com.xy.services.SystemParamsService;
 import com.xy.utils.*;
 import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
@@ -22,6 +24,7 @@ import tk.mybatis.mapper.util.StringUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,6 +39,9 @@ public class ShopServiceImpl extends BaseServiceImpl<Shop> implements ShopServic
     private ShopWalletService shopWalletService;
     @Autowired
     private ShopCategroyService shopCategroyService;
+    @Autowired
+    private SystemParamsService paramsService;
+    SystemParams params = null;
 
 
     @Override
@@ -61,6 +67,12 @@ public class ShopServiceImpl extends BaseServiceImpl<Shop> implements ShopServic
         return result;
     }
 
+
+    @Override
+    public int modifyShopByKeySelective(Shop shop) {
+        return super.updateByPrimaryKeySelective(shop);
+    }
+
     @Override
     public Shop selectOnly(Shop entity) {
         return this.handleInfo(super.selectOnly(entity));
@@ -83,6 +95,12 @@ public class ShopServiceImpl extends BaseServiceImpl<Shop> implements ShopServic
 
     @Override
     public PageInfo<Shop> selectPageListByParams(ParamsPojo pj) {
+        params = new SystemParams();
+        params.setType("clearScale");
+        params = paramsService.selectOnly(params);
+        BigDecimal value = new BigDecimal(params.getParamValue());
+        params.setDecValue(value);
+
         PageInfo<Shop> pageInfo = super.selectPageInfoByCondition(this.createCond(pj), pj.getStart(), pj.getStart());
         pageInfo.setList(this.handleResult(pageInfo.getList(), null));
         return pageInfo;
@@ -319,6 +337,9 @@ public class ShopServiceImpl extends BaseServiceImpl<Shop> implements ShopServic
         shop.setThumbImgShow(ResourcesConfig.SHOPURL + shop.getThumbImg());
         String moreImg = org.apache.commons.lang3.StringUtils.join(StringUtils.strToArray(shop.getMoreImg(), "#", ResourcesConfig.SHOPURL), "#");
         shop.setMoreImgShow(moreImg);
+        if(shop.getScale() == null) {
+            shop.setScale(params.getDecValue());
+        }
         shop.setShopDetail(ResourcesConfig.DESSHOPURL + shop.getShopDetail());
         if (StringUtils.isNotNull(lanlng)) {
             // 计算两坐标距离
