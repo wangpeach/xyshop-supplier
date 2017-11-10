@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 @Controller
@@ -25,15 +26,16 @@ public class ShopMoneyRecordController {
      * @param shopUuid
      * @return
      */
+    @ResponseBody
     @RequestMapping(value = "csinfo")
-    public @ResponseBody
-    Map<String, Object> statistics(@RequestParam String shopUuid) {
+    public Map<String, Object> statistics(@RequestParam String shopUuid) {
         Map<String, Object> result = moneyRecordService.statistics(shopUuid);
         Object money = result.get("money");
-        result.put("money", MoneyUtils.fen2Yuan(money));
+        result.put("money", money);
         result.put("everyMoney", MoneyUtils.fen2Yuan(result.get("everyMoney")));
         int buyedNum = Integer.parseInt(result.get("buyedNum").toString());
-        double everyMoney = MoneyUtils.fen2Yuan(money) / (buyedNum == 0 ? 1 : buyedNum);
+//        double everyMoney = MoneyUtils.fen2Yuan(money) / (buyedNum == 0 ? 1 : buyedNum);
+        BigDecimal everyMoney = new BigDecimal(money.toString()).divide(BigDecimal.valueOf(buyedNum == 0 ? 1 : buyedNum));
         result.put("everyMoney", everyMoney);
         return result;
     }

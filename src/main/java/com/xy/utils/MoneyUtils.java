@@ -66,8 +66,9 @@ public class MoneyUtils {
     }
 
     public static Double fen2Yuan(Object fen) {
-        if (fen == null)
+        if (fen == null) {
             return 0D;
+        }
         try {
             Long fenLong = Long.valueOf(fen + "");
             Money money = new Money();

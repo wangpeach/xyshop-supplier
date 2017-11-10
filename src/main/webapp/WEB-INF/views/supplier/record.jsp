@@ -110,8 +110,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                 <div class="panel panel-info">
                     <div class="panel-heading">
                         <span style="font-size: 16px">订单核销</span>
-                        <label for="search-write-off" style="margin-left: 20px;">消费码</label>
-                        <input type="text" id="search-write-off" style="color: #585757; font-size: 14px; padding: 0px; border: 1px solid #cacaca;">
+                        <label for="search-write-off" style="margin-left: 20px;">序列码</label>
+                        <input type="text" id="search-write-off" class="form-control" style="color: #585757; font-size: 14px; padding: 0px; border: 1px solid #cacaca; width: 180px; display: inline-block;">
                         <span style="font-size: 22px" id="formatCard"></span>
                     </div>
                     <div class="panel-body">
@@ -125,7 +125,6 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                                         <th>购买数量</th>
                                         <th>消费金额</th>
                                         <th>支付方式</th>
-                                        <th>下单类型</th>
                                         <th>购买时间</th>
                                         <th>操作</th>
                                     </tr>
@@ -136,7 +135,6 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                                         <td id="js-buy-num">--</td>
                                         <td id="js-buy-price">--</td>
                                         <td id="js-pay-why">--</td>
-                                        <td id="js-buy-type">--</td>
                                         <td id="js-buy-time">--</td>
                                         <td id="js-action">--</td>
                                     </tr>
@@ -161,12 +159,6 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                 </div>
                 <table id="cointable"></table>
             </div>
-            <!-- <div class="col-sm-12">
-                <div id="score-toolbar" class="btn-group">
-                    <label>店铺积分记录</label>
-                </div>
-                <table id="scoretable"></table>
-            </div> -->
         </div>
     </div>
     <!-- 店铺提现:开始 -->
@@ -175,7 +167,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="myModalLabel">申请提现金额</h4>
+                    <h4 class="modal-title">申请提现金额</h4>
                 </div>
                 <div class="modal-body">
                     <input type="hidden" id="js-update-uuid">
@@ -198,7 +190,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="myModalLabel">修改店铺结算信息(银行卡帐号不能都为空)</h4>
+                    <h4 class="modal-title" >修改店铺结算信息(银行卡帐号不能都为空)</h4>
                 </div>
                 <div class="modal-body">
                     <input type="hidden" id="js-update-uuid">

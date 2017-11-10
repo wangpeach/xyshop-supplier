@@ -1,7 +1,15 @@
 package com.xy.redis;
 
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
+import com.xy.models.SystemParams;
+import com.xy.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.lang.reflect.Type;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by rjora on 2017/7/16 0016.
@@ -11,19 +19,18 @@ public class RedisUtil {
 
     @Autowired
     private Redis redis;
-//
-//    private static final String shopKey = "_shop_";
-//
-//    private String getKey(String key) {
-//        return adminKey + key;
-//    }
-//
-//    public void saveAdmin(Admin admin) {
-//        redis.hashSave(getKey(admin.getUuid()), admin);
-//    }
-//
-//    public Admin getAdmin(String uuid) {
-//        String key = getKey(uuid);
-//        return (Admin) redis.hashGet(key, Admin.class);
-//    }
+
+
+    public List<SystemParams> getSysParams(String key) {
+        List<SystemParams> sps = null;
+        String strParams = redis.valueGet("sysparams");
+        if(StringUtils.isNotNull(strParams)) {
+            Type type = new TypeToken<List<SystemParams>>(){}.getType();
+            sps = new Gson().fromJson(strParams, type);
+        }
+        if(StringUtils.isNotNull(key)) {
+            sps = sps.stream().filter(params -> params.getType().equals(key)).collect(Collectors.toList());
+        }
+        return sps;
+    }
 }

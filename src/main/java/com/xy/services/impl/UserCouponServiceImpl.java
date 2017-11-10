@@ -211,7 +211,7 @@ public class UserCouponServiceImpl extends BaseServiceImpl<UserCoupon> implement
                     if (0 == (result - 1)) {
                         Shop shop = new Shop();
                         shop.setUuid(target.getAuthor());
-                        shop.setActive(false);
+                        shop.setActive("N");
                         shopService.updateByPrimaryKeySelective(shop);
                     }
                 }

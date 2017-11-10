@@ -3,12 +3,16 @@ package com.xy.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import com.xy.config.Config;
+import com.xy.models.Shop;
 import com.xy.models.UnionOrders;
+import com.xy.pojo.ParamsPojo;
 import com.xy.services.UnionOrderService;
+import com.xy.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import tk.mybatis.mapper.entity.Condition;
 import tk.mybatis.mapper.entity.Example;
+import tk.mybatis.mapper.util.StringUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,8 +39,35 @@ public class UnionOrderController {
     @ResponseBody
     @RequestMapping(value = {"list"})
     public PageInfo<UnionOrders> list(@RequestBody JSONObject jsonObject) {
+        ParamsPojo pj = new ParamsPojo(jsonObject);
 
-        return null;
+        Condition cond = new Condition(UnionOrders.class);
+        Example.Criteria cri = cond.createCriteria();
+
+        String payWhy = pj.getParams().get("payWay"), status = pj.getParams().get("status"), start = pj.getParams().get("startTime"), end = pj.getParams().get("endTime");
+        if (StringUtils.isNotNull(status)) {
+            cri.andEqualTo("status", status);
+        }
+        if (StringUtils.isNotNull(payWhy)) {
+            cri.andEqualTo("payWay", payWhy);
+        }
+        if (StringUtils.isNotNull(start)) {
+            cri.andGreaterThanOrEqualTo("addTime", start);
+        }
+        if (StringUtils.isNotNull(end)) {
+            cri.andLessThanOrEqualTo("addTime", end);
+        }
+        if (StringUtils.isNotNull(pj.getSearch())) {
+            String[] cols = {"userName", "shopName", "orderNo", "cardCode"};
+            String condition = " %s like ", arg = "'%" + pj.getSearch() + "%'";
+            for (int i = 0; i < cols.length; i++) {
+                cols[i] = String.format(condition, StringUtil.camelhumpToUnderline(cols[i])) + arg;
+            }
+
+            String or = org.apache.commons.lang3.StringUtils.join(cols, " or ");
+            cri.andCondition("(" + or + ")");
+        }
+        return orderService.selectPageInfoByCondition(cond, pj.getStart(), pj.getLength());
     }
 
     @ResponseBody
@@ -89,7 +120,7 @@ public class UnionOrderController {
     /**
      * 支付
      *
-     * @param order  订单 uuid
+     * @param order 订单 uuid
      * @return
      */
     @ResponseBody
@@ -119,6 +150,7 @@ public class UnionOrderController {
 
     /**
      * 微信支付签名
+     *
      * @param order
      * @return
      */
@@ -147,6 +179,7 @@ public class UnionOrderController {
 
     /**
      * 检查订单是否支付成功
+     *
      * @param key
      * @return
      */
@@ -157,5 +190,39 @@ public class UnionOrderController {
             return "success";
         }
         return "fail";
+    }
+
+
+    /**
+     * 订单核销查询
+     * @param cardcode
+     * @param shop
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("search-consume")
+    public UnionOrders searchConsume(@RequestParam String cardcode, @SessionAttribute("_loginshop_") Shop shop) {
+        UnionOrders order = new UnionOrders();
+        order.setShopUuid(shop.getUuid());
+        order.setCardCode(cardcode);
+        order.setStatus("waitConsume");
+        order = orderService.selectOnly(order);
+        return order;
+    }
+
+    /**
+     * 核销订单
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("consume")
+    public String consume(@RequestParam String uuid) {
+        UnionOrders orders = new UnionOrders();
+        orders.setUuid(uuid);
+        orders.setStatus("consumed");
+        if(orderService.updateByPrimaryKeySelective(orders) > 0) {
+            return "success";
+        }
+        return "error";
     }
 }

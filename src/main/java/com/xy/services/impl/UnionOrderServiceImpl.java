@@ -3,9 +3,11 @@ package com.xy.services.impl;
 import com.github.pagehelper.PageInfo;
 import com.xy.config.AliPay;
 import com.xy.models.*;
+import com.xy.redis.RedisUtil;
 import com.xy.services.*;
 import com.xy.utils.DateUtils;
 import com.xy.utils.RandomUtil;
+import com.xy.utils.SmsUtil;
 import com.xy.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,9 @@ import java.util.stream.Collectors;
 public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implements UnionOrderService {
 
     @Autowired
+    private RedisUtil redisUtil;
+
+    @Autowired
     private ShopService shopService;
 
     @Autowired
@@ -43,42 +48,15 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
     @Override
     public PageInfo<UnionOrders> selectPageInfoByCondition(Condition condition, int offset, int limit) {
         PageInfo<UnionOrders> orders = super.selectPageInfoByCondition(condition, offset, limit);
-
-        List<String> gids = orders.getList().stream().map(UnionOrders::getGoodsUuid).collect(Collectors.toList());
-        if (gids != null && gids.size() > 0) {
-            Condition cond = new Condition(UnionGoods.class);
-            cond.createCriteria().andIn("uuid", gids);
-            List<UnionGoods> goods = goodService.selectListByCondition(cond);
-            orders.getList().forEach(unionOrders -> {
-                String text = "";
-                switch (unionOrders.getStatus()) {
-                    case "waitPay":
-                        text = "待支付";
-                        break;
-                    case "paySuccess":
-                        text = "支付成功";
-                        break;
-                    case "payFail":
-                        text = "支付失败";
-                        break;
-                    case "waitConsume":
-                        text = "待使用";
-                        break;
-                    case "consumed":
-                        text = "已使用";
-                        break;
-                    default:
-                        text = "已退款";
-                        break;
-                }
-                unionOrders.setTextStatus(text);
-                UnionGoods item = goods.stream().filter(unionGoods -> unionOrders.getGoodsUuid().equals(unionGoods.getUuid())).findAny().get();
-                unionOrders.setGood(item);
-            });
-        }
+        orders.setList(this.handleResult(orders.getList()));
         return orders;
     }
 
+
+    @Override
+    public UnionOrders selectOnly(UnionOrders entity) {
+        return this.handleResult(super.selectOnly(entity));
+    }
 
     @Override
     public UnionOrders saveSelective(String userId, String shopId, String goodId, int num, String coupon) {
@@ -110,7 +88,7 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
             // 订单总金额，应付金额
             order.setTotalPrice(good.getPrice().multiply(BigDecimal.valueOf(num)));
             // 密码串码, 用户到店核销
-            String cordCode = StringUtils.splitWithChar(RandomUtil.getRandom(12, RandomUtil.TYPE.NUMBER), 4, ' ');
+            String cordCode = RandomUtil.getRandom(12, RandomUtil.TYPE.NUMBER);
             System.out.println("----------------------------------------------------------------" + cordCode);
             order.setCardCode(cordCode);
 
@@ -144,7 +122,7 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
     private UnionOrders implicitCoupon(User user, Shop shop, UnionOrders order) {
         Coupon coupon = null;
         // 如果商户处于促销活动期间，则查询商户发布的优惠卷信息
-        if (shop.isActive()) {
+        if ("Y".equals(shop.getActive())) {
             // 查询满足使用条件的优惠卷
             coupon = couponService.selectShopByOrder(user, shop, order);
             if (coupon != null) {
@@ -301,6 +279,18 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
             }
 
             result.put("status", "success");
+
+            // 发送支付成功短信
+            SystemParams sps = redisUtil.getSysParams("payok_sendmsg").get(0);
+            if(sps.getParamValue().equals("Y")) {
+                UnionGoods good = goodService.selectOnlyByKey(order.getGoodsUuid());
+                Map<String, String> params = new HashMap<>();
+                params.put("date", DateUtils.getCurrentDate());
+                params.put("shop", order.getShopName());
+                params.put("name", good.getName());
+                params.put("number", order.getCardCode());
+                new SmsUtil().sendTempSms(buyer.getPhoneNum(), params);
+            }
             return result;
         } else {
             result.put("status", "error");
@@ -314,5 +304,80 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
     public String writeOff(String shopUuid, String cardCode) {
         // TODO: 2017/11/6 核销订单，检查订单是否需要赠送优惠价
         return null;
+    }
+
+
+    @Override
+    public List<UnionOrders> handleResult(List<UnionOrders> args) {
+        List<String> gids = args.stream().map(UnionOrders::getGoodsUuid).collect(Collectors.toList());
+
+        Condition cond = new Condition(UnionGoods.class);
+        cond.createCriteria().andIn("uuid", gids);
+        List<UnionGoods> goods = goodService.selectListByCondition(cond);
+
+        args.forEach(unionOrders -> {
+            String text = "";
+            switch (unionOrders.getStatus()) {
+                case "waitPay":
+                    text = "待支付";
+                    break;
+                case "paySuccess":
+                    text = "支付成功";
+                    break;
+                case "payFail":
+                    text = "支付失败";
+                    break;
+                case "waitConsume":
+                    text = "待使用";
+                    break;
+                case "consumed":
+                    text = "已使用";
+                    break;
+                default:
+                    text = "已退款";
+                    break;
+            }
+            unionOrders.setTextStatus(text);
+            unionOrders.setCardCode(StringUtils.splitWithChar(unionOrders.getCardCode(), 4, ' '));
+            if(goods != null && goods.size() > 0) {
+                UnionGoods item = goods.stream().filter(unionGoods -> unionOrders.getGoodsUuid().equals(unionGoods.getUuid())).findAny().get();
+                unionOrders.setGood(item);
+            }
+        });
+        return args;
+    }
+
+
+    @Override
+    public UnionOrders handleResult(UnionOrders arg) {
+        String text = "";
+        if(arg == null) {
+            return null;
+        }
+        switch (arg.getStatus()) {
+            case "waitPay":
+                text = "待支付";
+                break;
+            case "paySuccess":
+                text = "支付成功";
+                break;
+            case "payFail":
+                text = "支付失败";
+                break;
+            case "waitConsume":
+                text = "待使用";
+                break;
+            case "consumed":
+                text = "已使用";
+                break;
+            default:
+                text = "已退款";
+                break;
+        }
+        arg.setTextStatus(text);
+        arg.setCardCode(StringUtils.splitWithChar(arg.getCardCode(), 4, ' '));
+        UnionGoods good = goodService.selectOnlyByKey(arg.getGoodsUuid());
+        arg.setGood(good);
+        return arg;
     }
 }
