@@ -8,6 +8,7 @@ import com.xy.services.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import tk.mybatis.mapper.common.Mapper;
 import tk.mybatis.mapper.entity.Condition;
+import tk.mybatis.mapper.entity.Example;
 
 import java.util.List;
 
@@ -72,6 +73,11 @@ public abstract class BaseServiceImpl<T> implements BaseService<T> {
     @Override
     public int count(T entity) {
         return mapper.selectCount(entity);
+    }
+
+    @Override
+    public int count(Example example) {
+        return mapper.selectCountByExample(example);
     }
 
     @Override

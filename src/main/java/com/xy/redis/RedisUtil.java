@@ -1,7 +1,7 @@
 package com.xy.redis;
 
-import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.xy.models.SystemParams;
 import com.xy.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

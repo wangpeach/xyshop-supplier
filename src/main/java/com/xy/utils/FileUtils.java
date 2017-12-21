@@ -474,10 +474,10 @@ public class FileUtils {
 
                 out.write(bytes);
                 out.flush();
-                out.close();
+                out.close();//                e.printStackTrace();
                 return true;
             } catch (IOException e) {
-//                e.printStackTrace();
+
                 System.out.println(e.toString());
                 return false;
             }

@@ -16,29 +16,25 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
 <body class="gray-bg">
 <input type="hidden" id="js-shop-uuid" value="${sessionScope.shopUuid}"> 
-	<div class="row wrapper border-bottom white-bg page-heading">
-        <div class="col-sm-4">
-            <h2>联盟商户订单管理界面</h2>
-        </div>
-    </div>
     <div class="wrapper wrapper-content">
         <div class="row">
             <div class="col-sm-12">
             <div id="order-toolbar" class="btn-group">
              	<label>订单状态</label>
              	<select class="form-control js-change-table-params" id="js-choise-status" style="width: 100px;display: inline-block;">
-             		<option value="" selected="selected">全部</option>
-             		<option value="waitPay">等待支付</option>
-             		<option value="paySuccess">支付完成</option>
-             		<option value="payFail">支付失败</option>
+					<option value="" selected="selected">全部</option>
+					<option value="waitPay">待支付</option>
+					<!-- <option value="paySuccess">支付成功</option> -->
+					<option value="waitConsume">待使用</option>
+					<option value="consumed">已使用</option>
+					<option style="display: none;" value="refunded">已退款</option>
 				</select>
              	<label style="padding-left: 10px;">支付方式:</label>
              	<select class="form-control js-change-table-params" id="js-choise-payway" style="width: 150px;display: inline-block;">
              		<option value="" selected="selected">全部</option>
              		<option value="coin">金币支付</option>
-             		<option value="weixin">微信支付</option>
+             		<option value="wxpay">微信支付</option>
              		<option value="alipay">支付宝</option>
-             		<option value="unionPay">银联支付</option>
              	</select>
              	<label>下单时间</label>
 				<input class="form-control layer-date js-change-table-params" style="width: 150px;vertical-align: baseline;"   id="js-date-begin" placeholder="开始时间">
@@ -50,6 +46,6 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
         </div>
     </div>
 <jsp:include page="../head/scripts.jsp"></jsp:include>
-<script>seajs.use("order/shoplist");</script>
+<script>seajs.use("order/orderlist");</script>
 </body>
 </html>

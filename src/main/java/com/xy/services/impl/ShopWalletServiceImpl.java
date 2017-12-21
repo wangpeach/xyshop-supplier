@@ -5,6 +5,8 @@ import com.xy.services.ShopWalletService;
 import com.xy.utils.MoneyUtils;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 /**
  * Created by rjora on 2017/7/16 0016.
  */
@@ -14,7 +16,7 @@ public class ShopWalletServiceImpl extends BaseServiceImpl<ShopWallet> implement
     public ShopWallet selectOnly(ShopWallet entity) {
         entity = super.selectOnly(entity);
         if(null == entity.getMoney()) {
-            entity.setMoney(0);
+            entity.setMoney(BigDecimal.ZERO);
         }
         entity.setDoubleMoney(MoneyUtils.fen2Yuan(entity.getMoney().longValue()));
         return entity;
@@ -24,7 +26,7 @@ public class ShopWalletServiceImpl extends BaseServiceImpl<ShopWallet> implement
     public ShopWallet selectOnlyByKey(Object key) {
         ShopWallet wallet = super.selectOnlyByKey(key);
         if(null == wallet.getMoney()) {
-            wallet.setMoney(0);
+            wallet.setMoney(BigDecimal.ZERO);
         }
         wallet.setDoubleMoney(MoneyUtils.fen2Yuan(wallet.getMoney().longValue()));
         return wallet;

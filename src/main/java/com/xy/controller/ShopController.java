@@ -2,8 +2,8 @@ package com.xy.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
-import com.xy.config.CookieUtils;
 import com.xy.config.Config;
+import com.xy.config.CookieUtils;
 import com.xy.models.Logs;
 import com.xy.models.Shop;
 import com.xy.models.ShopUpdateWallet;
@@ -13,7 +13,9 @@ import com.xy.services.LogService;
 import com.xy.services.ShopService;
 import com.xy.services.ShopUpdateWalletService;
 import com.xy.services.ShopWalletService;
-import com.xy.utils.*;
+import com.xy.utils.IpUtils;
+import com.xy.utils.Md5Util;
+import com.xy.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
@@ -168,7 +170,7 @@ public class ShopController {
     /**
      * 客户端搜索商10家
      *
-     * @param cates    分类
+     * @param
      * @param key
      * @param position 用户坐标
      * @param distance 搜索周围距离
@@ -176,8 +178,8 @@ public class ShopController {
      * @return
      */
     @PostMapping("mapi/list")
-    public List<Shop> mApiList(@RequestParam String cates, @RequestParam String key, @RequestParam String position, @RequestParam String distance, @RequestParam String orderBy, @RequestParam int offset) {
-        return shopService.mApiList(cates, key, position, distance, orderBy, offset, Config.LIMIT);
+    public List<Shop> mApiList(@RequestParam String user, @RequestParam String cates, @RequestParam String key, @RequestParam String position, @RequestParam String distance, @RequestParam String orderBy, @RequestParam int offset) {
+        return shopService.mApiList(user, cates, key, position, distance, orderBy, offset, Config.LIMIT);
     }
 
     @ResponseBody
@@ -189,7 +191,7 @@ public class ShopController {
 
     @RequestMapping("mapi/only")
     public Shop only(@RequestParam String uuid) {
-       return shopService.selectOnlyByKey(uuid);
+        return shopService.selectOnlyByKey(uuid);
     }
 
     /**
@@ -212,7 +214,7 @@ public class ShopController {
 
     @RequestMapping("modify")
     public String modify(@ModelAttribute Shop shop) {
-        if(shopService.modifyShopByKeySelective(shop) > 0) {
+        if (shopService.modifyShopByKeySelective(shop) > 0) {
             return "success";
         }
         return "error";

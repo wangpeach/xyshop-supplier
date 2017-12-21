@@ -1,6 +1,7 @@
 package com.xy.services.impl;
 
 import com.xy.config.Config;
+import com.xy.config.CouponConfig;
 import com.xy.models.*;
 import com.xy.services.CouponService;
 import com.xy.services.ShopService;
@@ -22,6 +23,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
+/**
+ * @author Administrator
+ */
 @EnableAsync
 @Service
 public class UserCouponServiceImpl extends BaseServiceImpl<UserCoupon> implements UserCouponService {
@@ -61,7 +65,7 @@ public class UserCouponServiceImpl extends BaseServiceImpl<UserCoupon> implement
 
         List<UserCoupon> userCoupons = super.selectList(userCoupon);
 
-        if(userCoupons != null && userCoupons.size() > 0) {
+        if (userCoupons != null && userCoupons.size() > 0) {
             // 查询优惠卷信息
             Condition cond = new Condition(Coupon.class);
             cond.createCriteria().andIn("uuid", userCoupons.stream().map(UserCoupon::getCoupon).collect(Collectors.toList()));
@@ -73,7 +77,7 @@ public class UserCouponServiceImpl extends BaseServiceImpl<UserCoupon> implement
                 item.setCoupon(coupon);
                 // 根据参数判断该订单是否可用优惠卷
                 boolean legal = (coupon.getToGoods().equals("good") && coupon.getToGoodsValue().equals(goodId)) || (coupon.getToGoods().equals("cate") && coupon.getToGoodsValue().equals(cate)) || coupon.getToGoods().equals("all");
-                if(legal) {
+                if (legal) {
                     legal = StringUtils.isNull(shopId) || (StringUtils.isNotNull(shopId) && coupon.getAuthor().equals(shopId));
                     if (legal) {
                         result.add(item);
@@ -96,7 +100,7 @@ public class UserCouponServiceImpl extends BaseServiceImpl<UserCoupon> implement
                 .andEqualTo("status", "online");
         List<Coupon> coupons = couponService.selectListByCondition(cond);
 
-        // TODO: 2017/10/16 废弃已过期的优惠卷, 查询出来的是已过期的，变更状态即可，完了还有用户的优惠卷也需要废弃
+        // TODO: 2017/10/16 废弃已过期的优惠卷, 查询出来的是已过期的，变更状态即可，用户的优惠卷也需要废弃
 
 //        couponService.updateByConditionSelective();
     }
@@ -178,7 +182,7 @@ public class UserCouponServiceImpl extends BaseServiceImpl<UserCoupon> implement
     private Coupon filter(List<Coupon> coupons, BigDecimal money, String toUser) {
         // 过滤出所有符合 消费金额，用户类型的优惠卷
         List<Coupon> others = coupons.stream().filter(coupon -> toUser.equals(coupon.getToUser()) && money.compareTo(BigDecimal.valueOf(coupon.getToUserValue())) > -1).sorted(Comparator.comparing(Coupon::getToUserValue)).collect(Collectors.toList());
-        if(others != null && others.size() > 0) {
+        if (others != null && others.size() > 0) {
             return others.get(0);
         }
         return null;
@@ -222,5 +226,14 @@ public class UserCouponServiceImpl extends BaseServiceImpl<UserCoupon> implement
             }
         }
         return false;
+    }
+
+    @Override
+    public boolean giveCoupon(String user, String _couponTarget) {
+        // 订单赠送优惠卷
+        Coupon coupon = couponService.selectOnlyByKey(_couponTarget);
+        UserCoupon userCoupon = new UserCoupon(user, coupon.getUuid(), 1, coupon.getEndTime());
+        this.saveSelective(userCoupon);
+        return true;
     }
 }

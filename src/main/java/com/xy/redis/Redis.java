@@ -102,6 +102,18 @@ public class Redis {
      * @param timeout 超时
      * @param unit    时间单位
      */
+    public void valueSaveTimeout(String key, Object value, long timeout, TimeUnit unit) {
+        getValueOps().set(key, String.valueOf(value), timeout, unit);
+    }
+
+    /**
+     * 保存信息，多长时间销毁
+     *
+     * @param key
+     * @param value
+     * @param timeout 超时
+     * @param unit    时间单位
+     */
     public void valueSaveTiemout(String key, Object value, long timeout, TimeUnit unit) {
         getValueOps().set(key, String.valueOf(value), timeout, unit);
     }

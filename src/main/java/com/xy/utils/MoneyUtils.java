@@ -11,11 +11,11 @@ public class MoneyUtils {
      * @param param
      * @return
      */
+    private static Pattern pattern = Pattern.compile("[0-9]*");
     public static boolean isNumeric(String param) {
         if (param == null || param == "") {
             return false;
         }
-        Pattern pattern = Pattern.compile("[0-9]*");
         return pattern.matcher(param).matches();
     }
 
@@ -57,8 +57,9 @@ public class MoneyUtils {
      * @return 如果传入的价钱为Null，返回0
      */
     public static Double fen2Yuan(Long fen) {
-        if (fen == null)
+        if (fen == null){
             return 0D;
+        }
         Money money = new Money();
         money.setCent(fen);
 
@@ -86,10 +87,12 @@ public class MoneyUtils {
      * @return 如果传入的价钱为Null，返回0
      */
     public static Long yuan2Fen(Double yuan) {
-        if (yuan == null)
+        if (yuan == null){
             return 0L;
-        else
+        }
+        else{
             return new Money(yuan).getCent();
+        }
     }
 
     /**

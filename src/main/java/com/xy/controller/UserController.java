@@ -24,6 +24,7 @@ import java.util.Map;
 
 /**
  * UserController
+ *
  * @author Administrator
  * @date 2017/10/27 17:30
  * @description
@@ -99,7 +100,13 @@ public class UserController {
             User user = new User();
             user.setUuid(userId);
             user.setHeadImg(fileName + ".png");
+            User hisUser = userService.selectOnlyByKey(userId);
             if (userService.updateByPrimaryKeySelective(user) > 0) {
+                // 删除历史图像
+                String hisImg = hisUser.getHeadImg();
+                if (StringUtils.isNotNull(hisUser)) {
+                    FileUtils.deleteFile(ResourcesConfig.HEADPATH + hisImg);
+                }
                 resMap.put("status", "success");
                 resMap.put("url", ResourcesConfig.HEADURL + fileName + ".png");
             } else {
@@ -178,5 +185,11 @@ public class UserController {
     public String details(@RequestParam String uuid) {
 
         return null;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "charts", produces = "application/json;charset=UTF-8")
+    public String charts(@RequestParam String type, @RequestParam Map<String, Object> params) {
+        return userService.charts(type, params);
     }
 }

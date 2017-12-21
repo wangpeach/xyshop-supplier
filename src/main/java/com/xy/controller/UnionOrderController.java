@@ -18,8 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -67,6 +66,9 @@ public class UnionOrderController {
             String or = org.apache.commons.lang3.StringUtils.join(cols, " or ");
             cri.andCondition("(" + or + ")");
         }
+
+        cond.setOrderByClause(pj.getOrder());
+
         return orderService.selectPageInfoByCondition(cond, pj.getStart(), pj.getLength());
     }
 
@@ -78,6 +80,18 @@ public class UnionOrderController {
         cri.andEqualTo("userUuid", user);
         if (!"all".equals(status)) {
             cri.andEqualTo("status", status);
+        }
+        switch (status) {
+            case "waitConsume":
+                cond.setOrderByClause(" pay_time desc");
+                break;
+            case "consumed":
+                cond.setOrderByClause(" complete_time desc");
+                break;
+            case "waitPay":
+            default:
+                cond.setOrderByClause(" add_time desc");
+                break;
         }
         return orderService.selectPageInfoByCondition(cond, page, Config.LIMIT);
     }
@@ -156,8 +170,9 @@ public class UnionOrderController {
      */
     @ResponseBody
     @RequestMapping(value = "mapi/wx-payment", produces = "application/text")
-    public String wxPayment(@RequestParam String order) {
-        return orderService.wxPayment(order);
+    public Map<String, String> wxPayment(@RequestParam String order) {
+        Map<String, String> result = orderService.wxPayment(order);
+        return result;
     }
 
 
@@ -168,7 +183,15 @@ public class UnionOrderController {
      */
     @RequestMapping("wx_receive_notify")
     public void wxReceiveNotify(HttpServletRequest request, HttpServletResponse response) {
-
+        String result = orderService.wxReceiveNotify(request);
+        try {
+            PrintWriter writer = response.getWriter();
+            writer.print(result);
+            writer.close();
+            writer.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -195,6 +218,7 @@ public class UnionOrderController {
 
     /**
      * 订单核销查询
+     *
      * @param cardcode
      * @param shop
      * @return
@@ -212,17 +236,26 @@ public class UnionOrderController {
 
     /**
      * 核销订单
+     *
      * @return
      */
     @ResponseBody
     @RequestMapping("consume")
     public String consume(@RequestParam String uuid) {
-        UnionOrders orders = new UnionOrders();
-        orders.setUuid(uuid);
-        orders.setStatus("consumed");
-        if(orderService.updateByPrimaryKeySelective(orders) > 0) {
-            return "success";
-        }
-        return "error";
+        return orderService.modifyWriteOff(uuid);
+    }
+
+
+    @ResponseBody
+    @RequestMapping(value = "charts", produces = "application/json;charset=UTF-8")
+    public String chart(@RequestParam String type, @RequestParam Map<String, Object> params) {
+        return orderService.charts(type, params);
+    }
+
+
+    @ResponseBody
+    @RequestMapping(value = "payway-td-charts")
+    public List<Map> paywayChart(@RequestParam String day) {
+        return orderService.payTypeCencusOfToday(day);
     }
 }

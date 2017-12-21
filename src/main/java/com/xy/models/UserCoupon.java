@@ -1,9 +1,25 @@
 package com.xy.models;
 
+import com.xy.utils.DateUtils;
+import com.xy.utils.StringUtils;
+
 import javax.persistence.*;
 
 @Table(name = "user_coupon")
 public class UserCoupon {
+
+    public UserCoupon() {}
+
+    public UserCoupon(String userid, String couponid, int num, String endTime) {
+        this.uuid = StringUtils.getUuid();
+        this.userid = userid;
+        this.couponid = couponid;
+        this.num = num;
+        this.endTime = endTime;
+        this.status = "waituser";
+        this.addTime = DateUtils.getCurrentDate();
+    }
+
     private String uuid;
 
     /**

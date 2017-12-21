@@ -32,6 +32,16 @@ public class SystemParams {
      */
     private String type;
 
+    private Integer inx;
+
+    public Integer getInx() {
+        return inx;
+    }
+
+    public void setInx(Integer inx) {
+        this.inx = inx;
+    }
+
     @Transient
     private BigDecimal decValue;
 

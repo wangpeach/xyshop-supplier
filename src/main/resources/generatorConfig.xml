@@ -61,7 +61,9 @@
 		<!--<table tableName="user_collect" domainObjectName="UserCollect"></table>-->
 		<!--<table tableName="user_footprint" domainObjectName="UserFootprint"></table>-->
 		<!--<table tableName="ad" domainObjectName="Ad"></table>-->
-		<table tableName="alipayments" domainObjectName="AliPayments"></table>
-		<table tableName="wxpayments" domainObjectName="WXPayments"></table>
+		<!--<table tableName="alipayments" domainObjectName="AliPayments"></table>-->
+		<!--<table tableName="wxpayments" domainObjectName="WXPayments"></table>-->
+		<!--<table tableName="platform_money_record" domainObjectName="PlatformMoneyRecord"></table>-->
+		<table tableName="search_record" domainObjectName="SearchRecord"></table>
 	</context>
 </generatorConfiguration>

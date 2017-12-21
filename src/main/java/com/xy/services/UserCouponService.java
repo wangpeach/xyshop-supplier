@@ -41,4 +41,6 @@ public interface UserCouponService extends BaseService<UserCoupon> {
      * @return
      */
     Coupon selectShopByOrder(User user, Shop shop, UnionOrders order);
+
+    boolean giveCoupon(String user, String _couponTarget);
 }

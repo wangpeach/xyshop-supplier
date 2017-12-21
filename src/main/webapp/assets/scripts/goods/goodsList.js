@@ -28,6 +28,8 @@ define(function (require) {
         var upload = require('uploadUtils');
         var $upload = new upload(),
             $upload2 = new upload();
+
+            
         var table = require('tableUtils');
 
 

@@ -24,5 +24,15 @@
     <result column="preferential_price" jdbcType="VARCHAR" property="preferentialPrice" />
     <result column="sys_tips" jdbcType="VARCHAR" property="sysTips" />
     <result column="out_trade_no" jdbcType="VARCHAR" property="outTradeNo" />
+    <result column="pay_time" jdbcType="VARCHAR" property="addTime" />
+    <result column="complete_time" jdbcType="VARCHAR" property="completeTime" />
   </resultMap>
+
+  <resultMap id="payTypeToday" type="Map">
+
+  </resultMap>
+
+  <select id="payTypeCencusOfToday" parameterType="Map" resultMap="payTypeToday">
+    SELECT count(*) as num, pay_way from union_orders WHERE pay_time &gt;= #{start} and pay_time $lt;= #{end} GROUP BY pay_way;
+  </select>
 </mapper>

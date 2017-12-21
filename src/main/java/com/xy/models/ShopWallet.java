@@ -1,6 +1,7 @@
 package com.xy.models;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 @Table(name = "shop_wallet")
 public class ShopWallet {
@@ -28,12 +29,12 @@ public class ShopWallet {
     /**
      * 余额
      */
-    private Integer money;
+    private BigDecimal money;
 
     /**
      * 积分余额
      */
-    private Integer score;
+    private BigDecimal score;
 
     /**
      * 支付使用的银行卡账户
@@ -137,7 +138,7 @@ public class ShopWallet {
      *
      * @return money - 余额
      */
-    public Integer getMoney() {
+    public BigDecimal getMoney() {
         return money;
     }
 
@@ -146,7 +147,7 @@ public class ShopWallet {
      *
      * @param money 余额
      */
-    public void setMoney(Integer money) {
+    public void setMoney(BigDecimal money) {
         this.money = money;
     }
 
@@ -155,7 +156,7 @@ public class ShopWallet {
      *
      * @return score - 积分余额
      */
-    public Integer getScore() {
+    public BigDecimal getScore() {
         return score;
     }
 
@@ -164,7 +165,7 @@ public class ShopWallet {
      *
      * @param score 积分余额
      */
-    public void setScore(Integer score) {
+    public void setScore(BigDecimal score) {
         this.score = score;
     }
 

@@ -5,6 +5,7 @@ import com.xy.pojo.ParamsPojo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Condition;
+import tk.mybatis.mapper.entity.Example;
 
 import java.util.List;
 
@@ -35,6 +36,8 @@ public interface BaseService<T> {
     int deleteByCondition(Condition condition);
 
     int count(T entity);
+
+    int count(Example example);
 
     T selectOnly(T entity);
 

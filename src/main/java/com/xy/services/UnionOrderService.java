@@ -3,10 +3,13 @@ package com.xy.services;
 import com.xy.models.UnionOrders;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Map;
 
 /**
- * Created by rjora on 2017/7/16 0016.
+ *
+ * @author rjora
+ * @date 2017/7/16 0016
  */
 public interface UnionOrderService extends BaseService<UnionOrders> {
 
@@ -40,7 +43,7 @@ public interface UnionOrderService extends BaseService<UnionOrders> {
      * @param orderUuid
      * @return
      */
-    String wxPayment(String orderUuid);
+    Map<String, String> wxPayment(String orderUuid);
 
     /**
      *微信异步回调通知验证
@@ -59,9 +62,27 @@ public interface UnionOrderService extends BaseService<UnionOrders> {
 
     /**
      * 订单核销
-     * @param shopUuid
-     * @param cardCode 订单核销码
+     * @param orderUuid
      * @return
      */
-    String writeOff(String shopUuid, String cardCode);
+    String modifyWriteOff(String orderUuid);
+
+    /**
+     * 订单统计
+     * @param type M, W, Custom
+     *             年，月，近七日，自定义
+     * @param params type=M : year 年份
+     *                   =W : 没有参数，默认近七天数据
+     *                   =Custom : 自定义选择
+     *
+     * @return JSON 格式
+     */
+    String charts(String type, Map<String, Object> params);
+
+    /**
+     * 某日订单支付类型统计
+     * @param day
+     * @return
+     */
+    public List<Map> payTypeCencusOfToday(String day);
 }

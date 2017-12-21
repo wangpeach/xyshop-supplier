@@ -123,7 +123,9 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                                         <th>购买用户名</th>
                                         <th>购买产品</th>
                                         <th>购买数量</th>
-                                        <th>消费金额</th>
+                                        <th>订单金额</th>
+                                        <th>实际支付金额</th>
+                                        <%--<th>优惠金额</th>--%>
                                         <th>支付方式</th>
                                         <th>购买时间</th>
                                         <th>操作</th>
@@ -133,7 +135,9 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                                         <td id="js-buy-user">--</td>
                                         <td id="js-goods-name">--</td>
                                         <td id="js-buy-num">--</td>
-                                        <td id="js-buy-price">--</td>
+                                        <td id="js-order-price">--</td>
+                                        <td id="js-pay-price">--</td>
+                                        <%--<td id="js-favourable-price">--</td>--%>
                                         <td id="js-pay-why">--</td>
                                         <td id="js-buy-time">--</td>
                                         <td id="js-action">--</td>

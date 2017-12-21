@@ -3,15 +3,13 @@ package com.xy.services.impl;
 import com.github.pagehelper.PageInfo;
 import com.xy.config.Config;
 import com.xy.config.ResourcesConfig;
+import com.xy.models.SearchRecord;
 import com.xy.models.Shop;
 import com.xy.models.ShopWallet;
 import com.xy.models.SystemParams;
 import com.xy.pojo.ParamsPojo;
 import com.xy.redis.RedisUtil;
-import com.xy.services.ShopService;
-import com.xy.services.ShopCategroyService;
-import com.xy.services.ShopWalletService;
-import com.xy.services.SystemParamsService;
+import com.xy.services.*;
 import com.xy.utils.*;
 import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
@@ -31,7 +29,9 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Created by rjora on 2017/7/14 0014.
+ *
+ * @author rjora
+ * @date 2017/7/14 0014
  */
 @Service
 public class ShopServiceImpl extends BaseServiceImpl<Shop> implements ShopService {
@@ -49,6 +49,9 @@ public class ShopServiceImpl extends BaseServiceImpl<Shop> implements ShopServic
     private SystemParamsService paramsService;
     SystemParams params = null;
 
+    @Autowired
+    private SearchRecrodService searchRecrodService;
+
 
     @Override
     public int saveSelective(Shop entity) {
@@ -60,7 +63,7 @@ public class ShopServiceImpl extends BaseServiceImpl<Shop> implements ShopServic
         // 创建钱包信息
         ShopWallet wallet = new ShopWallet();
         wallet.setShopUuid(entity.getUuid());
-        wallet.setMoney(0);
+        wallet.setMoney(BigDecimal.ZERO);
         wallet.setUuid(StringUtils.getUuid());
         result = shopWalletService.saveSelective(wallet);
         return result;
@@ -106,13 +109,13 @@ public class ShopServiceImpl extends BaseServiceImpl<Shop> implements ShopServic
         params.setDecValue(value);
 
 
-        PageInfo<Shop> pageInfo = super.selectPageInfoByCondition(this.createCond(pj), pj.getStart(), pj.getStart());
+        PageInfo<Shop> pageInfo = super.selectPageInfoByCondition(this.createCond(pj), pj.getStart(), pj.getLength());
         pageInfo.setList(this.handleResult(pageInfo.getList(), null));
         return pageInfo;
     }
 
     @Override
-    public List<Shop> mApiList(String cats, String key, String position, String distance, String orderBy, int offset, int limit) {
+    public List<Shop> mApiList(String user, String cats, String key, String position, String distance, String orderBy, int offset, int limit) {
         // 计算距离
         String[] latlng = position.split(",");
         StringBuilder sbr = new StringBuilder();
@@ -155,6 +158,18 @@ public class ShopServiceImpl extends BaseServiceImpl<Shop> implements ShopServic
 
             String or = org.apache.commons.lang3.StringUtils.join(cols, " or ");
             cri.andCondition("(" + or + ")");
+
+            // 添加用户搜索记录
+            SearchRecord record = new SearchRecord();
+            if(StringUtils.isNull(user)){
+                user = "游客";
+            }
+            // 所有关键字记录
+            record.setUuid(StringUtils.getUuid());
+            record.setUserUuid(user);
+            record.setKeyWord(key);
+            record.setAddTime(DateUtils.getCurrentDate());
+            searchRecrodService.saveSelective(record);
         }
 
         // 限制搜索距离
@@ -267,7 +282,7 @@ public class ShopServiceImpl extends BaseServiceImpl<Shop> implements ShopServic
                     element.attr("src", ResourcesConfig.SHOPURL + element.attr("title"));
                 });
 
-                byte[] detail = etDoc.getElementsByTag("body").get(0).children().toString().getBytes();
+                byte[] detail = etDoc.getElementsByTag("body").get(0).children().toString().getBytes("utf-8");
                 String detailName = StringUtils.getUuid() + ".spd";
                 FileUtils.writeByteArrayToFile(new File(ResourcesConfig.DESSHOPPATH + detailName), detail, false);
 

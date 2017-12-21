@@ -1,31 +1,40 @@
 package com.xy.services.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
+import com.github.wxpay.sdk.WXPay;
+import com.github.wxpay.sdk.WXPayUtil;
+import com.google.gson.Gson;
 import com.xy.config.AliPay;
+import com.xy.config.WXConfig;
+import com.xy.mapper.UnionOrdersMapper;
 import com.xy.models.*;
 import com.xy.redis.RedisUtil;
 import com.xy.services.*;
-import com.xy.utils.DateUtils;
-import com.xy.utils.RandomUtil;
-import com.xy.utils.SmsUtil;
-import com.xy.utils.StringUtils;
+import com.xy.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Condition;
+import tk.mybatis.mapper.entity.Example;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Created by rjora on 2017/7/16 0016.
+ * @author rjora
+ * @date 2017/7/16 0016
  */
 @Service
 public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implements UnionOrderService {
+
+    @Autowired
+    private UnionOrdersMapper ordersMapper;
 
     @Autowired
     private RedisUtil redisUtil;
@@ -40,10 +49,28 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
     private UserService userService;
 
     @Autowired
-    private UserCouponService couponService;
+    private CouponService couponService;
+
+    @Autowired
+    private UserCouponService userCouponService;
 
     @Autowired
     private AliPaymentsService aliPaymentsService;
+
+    @Autowired
+    private WxPaymentService wxPaymentService;
+
+    @Autowired
+    private ShopWalletService shopWalletService;
+
+    @Autowired
+    private ShopMoneyRecordService shopMoneyRecordService;
+
+    @Autowired
+    private SystemParamsService systemParamsService;
+
+    @Autowired
+    private PlatformMoneyRecordService platformMoneyRecordService;
 
     @Override
     public PageInfo<UnionOrders> selectPageInfoByCondition(Condition condition, int offset, int limit) {
@@ -94,7 +121,7 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
 
 
             if (StringUtils.isNotNull(order.getCoupon())) {
-                UserCoupon userCoupon = couponService.selectOnlyByKey(order.getCoupon());
+                UserCoupon userCoupon = userCouponService.selectOnlyByKey(order.getCoupon());
                 order = this.cprole(order, userCoupon.getCoupon());
             } else {
                 order = this.implicitCoupon(user, shop, order);
@@ -124,22 +151,27 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
         // 如果商户处于促销活动期间，则查询商户发布的优惠卷信息
         if ("Y".equals(shop.getActive())) {
             // 查询满足使用条件的优惠卷
-            coupon = couponService.selectShopByOrder(user, shop, order);
-            if (coupon != null) {
-                order.setSysTips(coupon.getName());
-            }
+            coupon = userCouponService.selectShopByOrder(user, shop, order);
         }
         // 该订单无法使用商户发布的优惠卷
         if (coupon == null) {
             //查询满足使用条件的官方优惠卷
-            coupon = couponService.selectOfficialByOrder(user, order);
-            if (coupon != null) {
-                order.setSysTips(coupon.getName());
-            }
+            coupon = userCouponService.selectOfficialByOrder(user, order);
         }
-
-        // 应支付金额
-        order = this.cprole(order, coupon);
+        if (coupon != null) {
+            // 检查优惠卷单用户使用次数限制
+            UnionOrders entity = new UnionOrders();
+            entity.setUserUuid(user.getUuid());
+            entity.setCoupon(coupon.getUuid());
+            int used = super.count(entity);
+            if (used < coupon.getUserMaxNum()) {
+                order.setSysTips(coupon.getNumber() + ": " + coupon.getName());
+            }
+            // 应支付金额
+            order = this.cprole(order, coupon);
+        } else {
+            order.setPayPrice(order.getTotalPrice());
+        }
         return order;
     }
 
@@ -155,8 +187,6 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
         // 支付金额
         BigDecimal payAmount = BigDecimal.ZERO;
         if (coupon != null) {
-            order.setSysTips(coupon.getName());
-
             BigDecimal discount = new BigDecimal(coupon.getRuleValue());
             switch (coupon.getRule()) {
                 case "discount":
@@ -217,7 +247,6 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
 
             String finished = "TRADE_FINISHED", success = "TRADE_SUCCESS";
             if (success.equals(payments.getTradeStatus()) || finished.equals(payments.getTradeStatus())) {
-                payments.getOutTradeNo();
                 UnionOrders order = new UnionOrders();
                 order.setOrderNo(payments.getOutTradeNo());
                 // 签名支付信息时 传入了自定义信息，携带了用户uuid，所以在这里可以取到
@@ -227,8 +256,12 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
                 if (order.getPayPrice().compareTo(new BigDecimal(payments.getTotalAmount())) == 0 && payments.getAppId().equals(AliPay.ali_appid)) {
                     order.setStatus("waitConsume");
                     order.setPayWay("alipay");
+                    order.setPayTime(DateUtils.getCurrentDate());
                     super.updateByPrimaryKeySelective(order);
+                    // 保存支付宝同步支付通知信息
                     aliPaymentsService.saveSelective(payments);
+                    User buyer = userService.selectOnlyByKey(order.getUserUuid());
+                    this.sendPaySucMsg(order, buyer.getPhoneNum());
                     result = "success";
                 }
             }
@@ -238,14 +271,75 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
 
 
     @Override
-    public String wxPayment(String orderUuid) {
-        return null;
+    public Map<String, String> wxPayment(String orderUuid) {
+        Map<String, String> result = null;
+        try {
+            UnionOrders order = this.selectOnlyByKey(orderUuid);
+            WXPay wxPay = new WXPay(new WXConfig());
+            Map<String, String> paydata = new HashMap<>();
+            paydata.put("attach", order.getUserUuid());
+            paydata.put("body", order.getShopName() + ":" + order.getOrderNo());
+            paydata.put("fee_type", "CNY");
+            paydata.put("out_trade_no", order.getOrderNo());
+            paydata.put("total_fee", String.valueOf(MoneyUtils.yuan2Fen(order.getPayPrice().doubleValue())));
+            paydata.put("spbill_create_ip", "127.0.0.1");
+            paydata.put("notify_url", WXConfig.notifyUrl);
+            paydata.put("trade_type", "APP");
+            result = wxPay.unifiedOrder(paydata);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
 
     @Override
     public String wxReceiveNotify(HttpServletRequest request) {
-        return null;
+        String notifyXml = "";
+        Map<String, String> notifyWx = new HashMap<>();
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(), "utf-8"));
+            String buffer = null;
+            StringBuffer sbr = new StringBuffer();
+            while ((buffer = br.readLine()) != null) {
+                sbr.append(buffer);
+            }
+            WXPay wxPay = new WXPay(new WXConfig());
+            Map<String, String> notifyMap = WXPayUtil.xmlToMap(sbr.toString());
+            if (wxPay.isPayResultNotifySignatureValid(notifyMap) && notifyMap.get("return_code").equals("SUCCESS")) {
+                // 验证成功
+                WXPayments wxPayments = new WXPayments(notifyMap);
+                UnionOrders order = new UnionOrders();
+                order.setOrderNo(wxPayments.getOutTradeNo());
+                // 下单时保存用户ID在 attach 里，所以可以直接取到
+                order.setUserUuid(wxPayments.getAttach());
+                order = this.selectOnly(order);
+                // 验证成功 金额匹配
+                if (wxPayments.getTotalFee().equals(order.getPayPrice().multiply(new BigDecimal(100)))) {
+                    order.setStatus("waitConsume");
+                    order.setPayWay("wxpay");
+                    order.setPayTime(DateUtils.getCurrentDate());
+                    super.updateByPrimaryKeySelective(order);
+                    // 保存微信同步支付通知信息
+                    wxPaymentService.saveSelective(wxPayments);
+                    User buyer = userService.selectOnlyByKey(order.getUserUuid());
+                    this.sendPaySucMsg(order, buyer.getPhoneNum());
+
+                    notifyMap.put("return_code", "SUCCESS");
+                    notifyMap.put("return_msg", "OK");
+                }
+                wxPaymentService.saveSelective(wxPayments);
+            } else {
+                notifyMap.put("return_code", "FAIL");
+                notifyMap.put("return_msg", "签名失败,参数格式校验错误");
+            }
+            notifyXml = WXPayUtil.mapToXml(notifyMap);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return notifyXml;
     }
 
     @Override
@@ -254,13 +348,14 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
 
         UnionOrders order = super.selectOnlyByKey(orderUuid);
         User buyer = userService.selectOnlyByKey(order.getUserUuid());
-        if(buyer.getCoin().compareTo(order.getPayPrice()) >= 0) {
+        if (buyer.getCoin().compareTo(order.getPayPrice()) >= 0) {
 
             order.setStatus("waitConsume");
             order.setPayWay("coin");
+            order.setPayTime(DateUtils.getCurrentDate());
 
             int affect = super.updateByPrimaryKeySelective(order);
-            if(affect < 1) {
+            if (affect < 1) {
                 result.put("status", "error");
                 result.put("tips", "出现内部错误");
                 return result;
@@ -270,8 +365,8 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
             other.setUuid(buyer.getUuid());
             other.setCoin(buyer.getCoin().subtract(order.getPayPrice()));
             affect = userService.updateByPrimaryKeySelective(other);
-            if(affect < 1) {
-                if(affect < 1) {
+            if (affect < 1) {
+                if (affect < 1) {
                     result.put("status", "error");
                     result.put("tips", "出现内部错误");
                     return result;
@@ -280,17 +375,7 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
 
             result.put("status", "success");
 
-            // 发送支付成功短信
-            SystemParams sps = redisUtil.getSysParams("payok_sendmsg").get(0);
-            if(sps.getParamValue().equals("Y")) {
-                UnionGoods good = goodService.selectOnlyByKey(order.getGoodsUuid());
-                Map<String, String> params = new HashMap<>();
-                params.put("date", DateUtils.getCurrentDate());
-                params.put("shop", order.getShopName());
-                params.put("name", good.getName());
-                params.put("number", order.getCardCode());
-                new SmsUtil().sendTempSms(buyer.getPhoneNum(), params);
-            }
+            this.sendPaySucMsg(order, buyer.getPhoneNum());
             return result;
         } else {
             result.put("status", "error");
@@ -300,15 +385,243 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
     }
 
 
+    public void sendPaySucMsg(UnionOrders order, String phoneNum) {
+        // 发送支付成功短信
+        SystemParams sps = redisUtil.getSysParams("payok_sendmsg").get(0);
+        if (sps.getParamValue().equals("Y")) {
+            UnionGoods good = goodService.selectOnlyByKey(order.getGoodsUuid());
+            Map<String, String> params = new HashMap<>();
+            params.put("date", DateUtils.getCurrentDate());
+            params.put("shop", order.getShopName());
+            params.put("name", good.getName());
+            params.put("number", order.getCardCode());
+            new SmsUtil().sendTempSms(phoneNum, params);
+        }
+    }
+
+
     @Override
-    public String writeOff(String shopUuid, String cardCode) {
-        // TODO: 2017/11/6 核销订单，检查订单是否需要赠送优惠价
-        return null;
+    public String modifyWriteOff(String orderUuid) {
+        UnionOrders orders = new UnionOrders();
+        orders.setUuid(orderUuid);
+        orders.setStatus("waitConsume");
+        orders = this.selectOnly(orders);
+        if (orders != null) {
+            UnionOrders over = new UnionOrders();
+            over.setUuid(orderUuid);
+            over.setStatus("consumed");
+            over.setCompleteTime(DateUtils.getCurrentDate());
+            int result = super.updateByPrimaryKeySelective(over);
+            if (result > 0) {
+                Shop shop = shopService.selectOnlyByKey(orders.getShopUuid());
+                // 优惠卷处理
+                Coupon coupon = couponService.selectOnlyByKey(orders.getCoupon());
+                // 赠送优惠卷
+                String recoupon = "recoupon";
+                if (recoupon.equals(coupon.getRule())) {
+                    userCouponService.giveCoupon(orders.getUserUuid(), coupon.getRuleValue());
+                }
+
+                // 平台收支信息
+                PlatformMoneyRecord platformMoney = new PlatformMoneyRecord();
+                platformMoney.setTotalMoney(orders.getTotalPrice());
+                platformMoney.setPayMoney(orders.getPayPrice());
+                platformMoney.setOrderuuid(orders.getUuid());
+                platformMoney.setShop(shop.getUuid());
+                platformMoney.setShopName(shop.getName());
+
+                // 更新商铺余额
+                ShopWallet wallet = new ShopWallet();
+                wallet.setShopUuid(orders.getShopUuid());
+                wallet = shopWalletService.selectOnly(wallet);
+
+                ShopWallet updWallet = new ShopWallet();
+
+                /**
+                 * 优惠金额承担方，商家承担则按实际支付金额给商家结算，运营商承担则按订单金额结算
+                 */
+                BigDecimal shopMoney = BigDecimal.ZERO;
+                // 平台收如金额
+                BigDecimal platformIncomeMoney = BigDecimal.ZERO;
+                // 如果商户有独立结算比例则使用商户的，不存在则使用全局结算比例
+                BigDecimal scale = BigDecimal.ZERO;
+                if (shop.getScale() != null) {
+                    scale = shop.getScale();
+                } else {
+                    SystemParams sp = new SystemParams();
+                    sp.setParamKey("clear_scale");
+                    sp = systemParamsService.selectOnly(sp);
+                    scale = BigDecimal.valueOf(Double.parseDouble(sp.getParamValue()));
+                }
+
+                if ("supplier".equals(coupon.getBearParty())) {
+                    // 商家承担优惠费用
+                    BigDecimal balance = orders.getPayPrice().multiply(scale);
+                    shopMoney = wallet.getMoney().add(balance);
+                    platformIncomeMoney = orders.getPayPrice().subtract(balance);
+                } else {
+                    // 平台支出
+                    platformMoney.setMoney(orders.getTotalPrice().subtract(orders.getPayPrice()));
+                    platformMoney.setType("expend");
+                    platformMoney.setCreatetime(DateUtils.getCurrentDate());
+                    platformMoney.setRemark("存有优惠信息，平台承担优惠金额");
+                    platformMoney.setUuid(StringUtils.getUuid());
+                    platformMoneyRecordService.saveSelective(platformMoney);
+
+                    // 平台承担优惠费用
+                    BigDecimal balance = orders.getTotalPrice().multiply(scale);
+                    shopMoney = wallet.getMoney().add(balance);
+                    platformIncomeMoney = orders.getTotalPrice().subtract(balance);
+                }
+                updWallet.setMoney(shopMoney);
+                Condition cond = new Condition(ShopWallet.class);
+                cond.createCriteria().andEqualTo("uuid", wallet.getUuid()).andEqualTo("shopUuid", wallet.getShopUuid());
+                shopWalletService.updateByConditionSelective(updWallet, cond);
+
+
+                platformMoney.setMoney(platformIncomeMoney);
+                platformMoney.setType("income");
+                platformMoney.setCreatetime(DateUtils.getCurrentDate());
+                platformMoney.setRemark("平台应得商户结算后金额");
+                platformMoney.setScale(scale);
+                platformMoney.setUuid(StringUtils.getUuid());
+                platformMoneyRecordService.saveSelective(platformMoney);
+
+                // 商家收入记录
+                ShopMoneyRecord moneyRecord = new ShopMoneyRecord();
+                moneyRecord.setUuid(StringUtils.getUuid());
+                moneyRecord.setShopUuid(orders.getShopUuid());
+                moneyRecord.setShopName(orders.getShopName());
+                moneyRecord.setMoney(orders.getPayPrice());
+                moneyRecord.setLeftMoney(updWallet.getMoney());
+                moneyRecord.setType("income");
+                moneyRecord.setStatus("success");
+                moneyRecord.setRemarks("会员(" + orders.getUserName() + ")购买" + orders.getGood().getName() + ",数量:" + orders.getGoodsNum());
+                moneyRecord.setAddTime(DateUtils.getCurrentDate());
+                moneyRecord.setOperateTime(DateUtils.getCurrentDate());
+                moneyRecord.setPayType(orders.getPayWay());
+                moneyRecord.setUnionOrderUuid(orders.getUuid());
+                shopMoneyRecordService.saveSelective(moneyRecord);
+            } else {
+                return "error";
+            }
+        } else {
+            return "null";
+        }
+        return "success";
+    }
+
+    @Override
+    public String charts(String type, Map<String, Object> params) {
+        String result = null;
+        switch (type) {
+            case "M":
+                params.get("year");
+                break;
+            case "W":
+                result = this.weekCount();
+                break;
+            case "Custom":
+                params.get("start");
+                params.get("end");
+                break;
+            default:
+                break;
+        }
+        return result;
+    }
+
+    /**
+     * 按月统计
+     *
+     * @return
+     */
+    public String monthCount(String year) {
+        Map<String, Object> result = new HashMap<>();
+
+        String json = new Gson().toJson(result);
+        return json;
+    }
+
+    /**
+     * 统计今七天销量
+     *
+     * @return
+     */
+    public String weekCount() {
+        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> titleMap = new HashMap<>();
+        titleMap.put("text", "近七日销量");
+        Map<String, Object> legendMap = new HashMap<>();
+        legendMap.put("data", new String[]{"支付完成", "订单完成"});
+        result.put("title", titleMap);
+        result.put("legend", legendMap);
+
+        List<Map<String, Object>> series = new ArrayList<>();
+        Map<String, Object> payover = new HashMap<>();
+        payover.put("name", "支付完成");
+        payover.put("type", "bar");
+        Map<String, Object> orderover = new HashMap<>();
+        orderover.put("name", "订单完成");
+        orderover.put("type", "bar");
+
+        result.put("tooltip", new Object());
+
+        List<String> xAxisData = new ArrayList<>();
+
+        List<Integer> payOverData = new ArrayList<>();
+        List<Integer> orderOverData = new ArrayList<>();
+
+        for (int i = 6; i >= 0; i--) {
+            String time = DateUtils.format(DateUtils.getCurrentOffsetDay(-i));
+            xAxisData.add(time);
+
+
+            Example example = new Example(UnionOrders.class);
+
+            example.createCriteria().andGreaterThanOrEqualTo("payTime", time + " 00:00:00").andLessThanOrEqualTo("payTime", time + " 23:59:59").andEqualTo("status", "waitConsume");
+            payOverData.add(super.count(example));
+
+            example.clear();
+            example.createCriteria().andGreaterThanOrEqualTo("completeTime", time + " 00:00:00").andLessThanOrEqualTo("completeTime", time + " 23:59:59").andEqualTo("status", "consumed");
+            orderOverData.add(super.count(example));
+        }
+        Map<String, Object> xaxisMap = new HashMap<>();
+        xaxisMap.put("data", xAxisData);
+        result.put("xAxis", xaxisMap);
+
+        result.put("yAxis", new Object());
+
+        payover.put("data", payOverData);
+        orderover.put("data", orderOverData);
+        series.add(payover);
+        series.add(orderover);
+        result.put("series", series);
+        String json = new Gson().toJson(result);
+        return json;
+    }
+
+    /**
+     * 自定义统计
+     *
+     * @param start
+     * @param end
+     * @return
+     */
+    private String customCount(String start, String end) {
+        Map<String, Object> result = new HashMap<>();
+
+        String json = new Gson().toJson(result);
+        return json;
     }
 
 
     @Override
     public List<UnionOrders> handleResult(List<UnionOrders> args) {
+        if (args == null || args.size() == 0) {
+            return args;
+        }
+
         List<String> gids = args.stream().map(UnionOrders::getGoodsUuid).collect(Collectors.toList());
 
         Condition cond = new Condition(UnionGoods.class);
@@ -339,7 +652,9 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
             }
             unionOrders.setTextStatus(text);
             unionOrders.setCardCode(StringUtils.splitWithChar(unionOrders.getCardCode(), 4, ' '));
-            if(goods != null && goods.size() > 0) {
+
+
+            if (goods != null && goods.size() > 0) {
                 UnionGoods item = goods.stream().filter(unionGoods -> unionOrders.getGoodsUuid().equals(unionGoods.getUuid())).findAny().get();
                 unionOrders.setGood(item);
             }
@@ -351,7 +666,7 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
     @Override
     public UnionOrders handleResult(UnionOrders arg) {
         String text = "";
-        if(arg == null) {
+        if (arg == null) {
             return null;
         }
         switch (arg.getStatus()) {
@@ -380,4 +695,16 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
         arg.setGood(good);
         return arg;
     }
+
+    @Override
+    public List<Map> payTypeCencusOfToday(String day) {
+        Map<String, Object> params = new HashMap<>();
+        if (StringUtils.isNull(day)) {
+            day = DateUtils.getDate();
+        }
+        params.put("start", day + " 00:00:00");
+        params.put("end", day + " 23:59:59");
+        return ordersMapper.payTypeCencusOfToday(params);
+    }
 }
+

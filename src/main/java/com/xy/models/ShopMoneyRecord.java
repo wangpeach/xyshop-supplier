@@ -59,7 +59,7 @@ public class ShopMoneyRecord {
     private String operateTime;
 
     /**
-     * 支付方式：coin(金币支付)、weixin（微信支付）、alipay（支付宝）、unionPay(银联支付)、wallet(钱包支付)
+     * 支付方式：coin(金币支付)、weixin（微信支付）、alipay（支付宝）
      */
     @Column(name = "pay_type")
     private String payType;
@@ -68,12 +68,6 @@ public class ShopMoneyRecord {
      * 商户实际收入金额
      */
     private BigDecimal balance;
-
-    /**
-     * 下单类型 custom:（整单购买），assign（套餐购买)
-     */
-    @Column(name = "buy_type")
-    private String buyType;
 
     /**
      * 商家订单编号
@@ -291,24 +285,6 @@ public class ShopMoneyRecord {
      */
     public void setBalance(BigDecimal balance) {
         this.balance = balance;
-    }
-
-    /**
-     * 获取下单类型 custom:（整单购买），assign（套餐购买)
-     *
-     * @return buy_type - 下单类型 custom:（整单购买），assign（套餐购买)
-     */
-    public String getBuyType() {
-        return buyType;
-    }
-
-    /**
-     * 设置下单类型 custom:（整单购买），assign（套餐购买)
-     *
-     * @param buyType 下单类型 custom:（整单购买），assign（套餐购买)
-     */
-    public void setBuyType(String buyType) {
-        this.buyType = buyType == null ? null : buyType.trim();
     }
 
     /**

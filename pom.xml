@@ -10,6 +10,13 @@
     <version>1.0-SNAPSHOT</version>
     <url>http://maven.apache.org</url>
 
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
     <properties>
         <!--  MyBatis Generator  -->
         <!--  Java接口和实体类  -->
@@ -29,6 +36,12 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>com.github.wxpay</groupId>
+            <artifactId>WXPay-SDK-Java</artifactId>
+            <version>0.0.4</version>
+        </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -238,18 +251,35 @@
             <artifactId>spring-data-redis</artifactId>
             <version>1.8.4.RELEASE</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/biz.paluch.redis/lettuce -->
         <dependency>
             <groupId>biz.paluch.redis</groupId>
             <artifactId>lettuce</artifactId>
-            <version>4.3.3.Final</version>
+            <version>4.4.1.Final</version>
         </dependency>
+
+
         <!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
             <version>1.10.3</version>
         </dependency>
-
+        <dependency>
+            <groupId>cn.jpush.api</groupId>
+            <artifactId>jsms-client</artifactId>
+            <version>1.2.3</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.jpush.api</groupId>
+            <artifactId>jiguang-common</artifactId>
+            <version>1.0.8</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>19.0</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -292,6 +322,10 @@
                 <configuration>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
+                    <encoding>UTF-8</encoding>
+                    <compilerArguments>
+                        <extdirs>src/main/webapp/WEB-INF/lib</extdirs><!--指定外部lib-->
+                    </compilerArguments>
                 </configuration>
             </plugin>
 

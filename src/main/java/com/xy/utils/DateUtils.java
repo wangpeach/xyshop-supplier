@@ -9,6 +9,12 @@ import java.util.Date;
  * 日期格式化工具
  */
 public class DateUtils {
+
+    public static String format(Date date) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        return format.format(date);
+    }
+
 	/**
 	 * 获取当前时间 yyyy-MM-dd HH:mm:ss
 	 * @return 
@@ -294,7 +300,8 @@ public class DateUtils {
           }
           return false;
   }
-    
-	
+
+
+
 }
 

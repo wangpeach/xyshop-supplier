@@ -1,8 +1,40 @@
 package com.xy.models;
 
 import javax.persistence.*;
+import java.util.Map;
 
 public class WXPayments {
+
+    public WXPayments() {
+    }
+
+    public WXPayments(Map<String, String> arg) {
+        this.appid = arg.get("appid");
+        this.mchId = arg.get("mch_id");
+        this.deviceInfo = arg.get("device_info");
+        this.nonceStr = arg.get("nonce_str");
+        this.sign = arg.get("sign");
+        this.resultCode = arg.get("result_code");
+        this.errCode = arg.get("err_code");
+        this.errCodeDes = arg.get("err_code_des");
+        this.openid = arg.get("openid");
+        this.isSubscribe = arg.get("is_subscribe");
+        this.tradeType = arg.get("trade_type");
+        this.bankType = arg.get("bank_type");
+        this.totalFee = Integer.parseInt(arg.get("total_fee"));
+        this.feeType = arg.get("fee_type");
+        this.cashFee = Integer.parseInt(arg.get("cash_fee"));
+        this.cashFeeType = arg.get("cash_fee_type");
+        this.couponFee = Integer.parseInt(arg.get("coupon_fee"));
+        this.couponCount = Integer.parseInt(arg.get("coupon_count"));
+        this.couponIdN = arg.get("coupon_id_$n");
+        this.couponFeeN = Integer.parseInt(arg.get("coupon_fee_$n"));
+        this.transactionId = arg.get("transaction_id");
+        this.outTradeNo = arg.get("out_trade_no");
+        this.attach = arg.get("attach");
+        this.timeEnd = arg.get("time_end");
+    }
+
     /**
      * 应用ID
      */

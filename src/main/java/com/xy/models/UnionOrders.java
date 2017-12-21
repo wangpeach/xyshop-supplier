@@ -71,6 +71,18 @@ public class UnionOrders {
     private String addTime;
 
     /**
+     * 支付时间
+     */
+    @Column(name = "pay_time")
+    private String payTime;
+
+    /**
+     * 核销时间
+     */
+    @Column(name = "complete_time")
+    private String completeTime;
+
+    /**
      * 产品UUID
      */
     @Column(name = "goods_uuid")
@@ -112,6 +124,8 @@ public class UnionOrders {
      */
     @Column(name = "out_trade_no")
     private String outTradeNo;
+
+
 
     @Transient
     private UnionGoods good;
@@ -419,6 +433,22 @@ public class UnionOrders {
      */
     public void setPreferentialPrice(String preferentialPrice) {
         this.preferentialPrice = preferentialPrice;
+    }
+
+    public String getPayTime() {
+        return payTime;
+    }
+
+    public void setPayTime(String payTime) {
+        this.payTime = payTime;
+    }
+
+    public String getCompleteTime() {
+        return completeTime;
+    }
+
+    public void setCompleteTime(String completeTime) {
+        this.completeTime = completeTime;
     }
 
     public String getSysTips() {

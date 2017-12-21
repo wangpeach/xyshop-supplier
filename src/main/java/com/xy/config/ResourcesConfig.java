@@ -21,6 +21,8 @@ public class ResourcesConfig implements EnvironmentAware {
      */
     public static final String SYSTEM_PATH = System.getProperty("evan.xyslr");
 
+    public static String wxCert;
+
 
     /**
      * 文件临时保存路径
@@ -118,7 +120,7 @@ public class ResourcesConfig implements EnvironmentAware {
         ResourcesConfig.DESGOODSPATH = basePath + env.getProperty("file.desgoods");
         ResourcesConfig.DESADPATH = basePath + env.getProperty("file.descAd");
 
-
+        ResourcesConfig.wxCert = env.getProperty("wx.certfile");
 
         ResourcesConfig.REQTEMP = baseUrl + env.getProperty("req.temp");
         ResourcesConfig.SHOPURL = baseUrl + env.getProperty("req.shop");

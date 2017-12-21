@@ -48,7 +48,7 @@ public class PageController {
      * 商品管理
      * @return
      */
-    @RequestMapping(value = "/shop/goodspage.html")
+    @RequestMapping(value = "/goodspage.html")
     public String goodsPage() {
         return "goods/goods_list";
     }
@@ -57,7 +57,7 @@ public class PageController {
      * 订单管理
       * @return
      */
-    @RequestMapping(value = "/shop/orderpage.html")
+    @RequestMapping(value = "/orderpage.html")
     public String ordersPage() {
         return "order/order_list";
     }
@@ -66,9 +66,11 @@ public class PageController {
      * 商铺设置
      * @return
      */
-    @RequestMapping(value = "/shop/setting.html")
-    public String settingPage() {
-        return "supplier/setting";
+    @RequestMapping(value = "/setting.html")
+    public ModelAndView settingPage(@SessionAttribute("_loginshop_") Shop shop, ModelAndView view) {
+        view.addObject("self", shop);
+        view.setViewName("supplier/setting");
+        return view;
     }
 
 
@@ -76,7 +78,7 @@ public class PageController {
      * 商铺设置
      * @return
      */
-    @RequestMapping(value = "/shop/coupon.html")
+    @RequestMapping(value = "/coupon.html")
     public ModelAndView settingPage(ModelAndView view, @SessionAttribute("_loginshop_") Shop shop) {
         System.out.println(shop.getUuid());
         view.addObject("uuid", shop.getUuid());
