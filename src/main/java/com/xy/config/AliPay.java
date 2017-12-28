@@ -8,6 +8,7 @@ import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.api.request.AlipayTradeAppPayRequest;
 import com.alipay.api.response.AlipayTradeAppPayResponse;
 
+import java.text.DecimalFormat;
 import java.util.Map;
 
 /**
@@ -64,9 +65,12 @@ public class AliPay {
         //SDK已经封装掉了公共参数，这里只需要传入业务参数。以下方法为sdk的model入参方式(model和biz_content同时存在的情况下取biz_content)。
         AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
 
+        DecimalFormat decimalFormat = new DecimalFormat("#.##");
+
         model.setOutTradeNo(outTradeNo);
         model.setSubject(subject);
         model.setBody(body);
+        amount = decimalFormat.format(Double.valueOf(amount));
         model.setTotalAmount(amount);
         model.setGoodsType("1");
         model.setTimeoutExpress(timeout);

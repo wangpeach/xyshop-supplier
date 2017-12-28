@@ -5,7 +5,7 @@ import com.github.wxpay.sdk.WXPayConfig;
 import java.io.*;
 
 public class WXConfig implements WXPayConfig{
-    private final String KEY = "Ar6biRqek8X1zAtfv5632AxPv2x039SVFvW0";
+    private final String KEY = "6zRDLD5D9ZWAlDW7auujay9kdV5oC0A9";
     private final String WX_APPID = "wx9b1fa09595b5d87c";
     private final String MCH_ID = "1491858182";
     public static final String notifyUrl = "http://219.141.127.213:8087/xyshop-supplier/order/wx_receive_notify";

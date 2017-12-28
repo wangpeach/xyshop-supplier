@@ -169,9 +169,9 @@ public class UnionOrderController {
      * @return
      */
     @ResponseBody
-    @RequestMapping(value = "mapi/wx-payment", produces = "application/text")
-    public Map<String, String> wxPayment(@RequestParam String order) {
-        Map<String, String> result = orderService.wxPayment(order);
+    @RequestMapping(value = "mapi/wx-payment", produces = "application/json")
+    public Map<String, String> wxPayment(@RequestParam String order, @RequestParam String ip) {
+        Map<String, String> result = orderService.wxPayment(order, ip);
         return result;
     }
 

@@ -3,6 +3,7 @@ package com.xy.services.impl;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageInfo;
 import com.github.wxpay.sdk.WXPay;
+import com.github.wxpay.sdk.WXPayConstants;
 import com.github.wxpay.sdk.WXPayUtil;
 import com.google.gson.Gson;
 import com.xy.config.AliPay;
@@ -229,6 +230,9 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
         String result = "error";
         Map<String, String> params = new HashMap<>();
         Map requestParams = request.getParameterMap();
+
+        System.out.println(requestParams);
+
         for (Iterator iter = requestParams.keySet().iterator(); iter.hasNext(); ) {
             String name = (String) iter.next();
             String[] values = (String[]) requestParams.get(name);
@@ -271,25 +275,40 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
 
 
     @Override
-    public Map<String, String> wxPayment(String orderUuid) {
+    public Map<String, String> wxPayment(String orderUuid, String ip) {
         Map<String, String> result = null;
+        Map<String, String> appArgs = new HashMap<>();
         try {
             UnionOrders order = this.selectOnlyByKey(orderUuid);
-            WXPay wxPay = new WXPay(new WXConfig());
+            UnionGoods good = goodService.selectOnlyByKey(order.getGoodsUuid());
+
+            WXConfig wxConfig = new WXConfig();
+            WXPay wxPay = new WXPay(wxConfig);
             Map<String, String> paydata = new HashMap<>();
             paydata.put("attach", order.getUserUuid());
             paydata.put("body", order.getShopName() + ":" + order.getOrderNo());
-            paydata.put("fee_type", "CNY");
+//            paydata.put("body", good.getName());
             paydata.put("out_trade_no", order.getOrderNo());
             paydata.put("total_fee", String.valueOf(MoneyUtils.yuan2Fen(order.getPayPrice().doubleValue())));
-            paydata.put("spbill_create_ip", "127.0.0.1");
+            paydata.put("spbill_create_ip", ip);
             paydata.put("notify_url", WXConfig.notifyUrl);
             paydata.put("trade_type", "APP");
             result = wxPay.unifiedOrder(paydata);
+
+
+            appArgs.put("appid", wxConfig.getAppID());
+            appArgs.put("partnerid", wxConfig.getMchID());
+            appArgs.put("prepayid", result.get("prepay_id"));
+            appArgs.put("timestamp", String.valueOf(System.currentTimeMillis() / 1000));
+            appArgs.put("noncestr", WXPayUtil.generateNonceStr());
+            appArgs.put("package", "Sign=WXPay");
+            String sign = WXPayUtil.generateSignature(appArgs, wxConfig.getKey(), WXPayConstants.SignType.MD5);
+            appArgs.put("sign", sign);
+            System.out.println(new Gson().toJson(appArgs));
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return result;
+        return appArgs;
     }
 
 
@@ -306,6 +325,9 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
             }
             WXPay wxPay = new WXPay(new WXConfig());
             Map<String, String> notifyMap = WXPayUtil.xmlToMap(sbr.toString());
+
+            System.out.println(notifyMap);
+
             if (wxPay.isPayResultNotifySignatureValid(notifyMap) && notifyMap.get("return_code").equals("SUCCESS")) {
                 // 验证成功
                 WXPayments wxPayments = new WXPayments(notifyMap);

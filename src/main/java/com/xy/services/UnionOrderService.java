@@ -43,7 +43,7 @@ public interface UnionOrderService extends BaseService<UnionOrders> {
      * @param orderUuid
      * @return
      */
-    Map<String, String> wxPayment(String orderUuid);
+    Map<String, String> wxPayment(String orderUuid, String ip);
 
     /**
      *微信异步回调通知验证
