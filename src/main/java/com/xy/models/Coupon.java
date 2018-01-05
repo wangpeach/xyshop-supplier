@@ -63,7 +63,7 @@ public class Coupon {
     private String ruleValue;
 
     /**
-     * 目标商品：all（全场），cate（某一类别商品），shop（某一商铺）
+     * 目标商品：all（全场），cate（某一类别商品），good（某商品）
      */
     @Column(name = "to_goods")
     private String toGoods;

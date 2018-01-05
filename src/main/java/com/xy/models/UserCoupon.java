@@ -16,7 +16,7 @@ public class UserCoupon {
         this.couponid = couponid;
         this.num = num;
         this.endTime = endTime;
-        this.status = "waituser";
+        this.status = "waituse";
         this.addTime = DateUtils.getCurrentDate();
     }
 
@@ -46,7 +46,7 @@ public class UserCoupon {
     private String endTime;
 
     /**
-     * waituser(待使用)，used(已使用)，expired(已过期)
+     * waituse(待使用)，used(已使用)，expired(已过期)
      */
     private String status;
 

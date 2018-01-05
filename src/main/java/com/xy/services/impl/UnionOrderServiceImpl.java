@@ -125,7 +125,7 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
                 UserCoupon userCoupon = userCouponService.selectOnlyByKey(order.getCoupon());
                 order = this.cprole(order, userCoupon.getCoupon());
             } else {
-                order = this.implicitCoupon(user, shop, order);
+                order = this.implicitCoupon(user, shop, good, order);
             }
 
             // 用户支付后更改支付方式
@@ -147,17 +147,17 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
      * @param shop
      * @param order
      */
-    private UnionOrders implicitCoupon(User user, Shop shop, UnionOrders order) {
+    private UnionOrders implicitCoupon(User user, Shop shop, UnionGoods good, UnionOrders order) {
         Coupon coupon = null;
         // 如果商户处于促销活动期间，则查询商户发布的优惠卷信息
         if ("Y".equals(shop.getActive())) {
             // 查询满足使用条件的优惠卷
-            coupon = userCouponService.selectShopByOrder(user, shop, order);
+            coupon = userCouponService.selectShopByOrder(user, shop, good, order);
         }
         // 该订单无法使用商户发布的优惠卷
         if (coupon == null) {
             //查询满足使用条件的官方优惠卷
-            coupon = userCouponService.selectOfficialByOrder(user, order);
+            coupon = userCouponService.selectOfficialByOrder(user, good, order);
         }
         if (coupon != null) {
             // 检查优惠卷单用户使用次数限制
@@ -188,15 +188,17 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
         // 支付金额
         BigDecimal payAmount = BigDecimal.ZERO;
         if (coupon != null) {
-            BigDecimal discount = new BigDecimal(coupon.getRuleValue());
+            BigDecimal discount = BigDecimal.ZERO;
             switch (coupon.getRule()) {
                 case "discount":
+                    discount = new BigDecimal(coupon.getRuleValue());
                     // 折扣
                     discount = discount.divide(BigDecimal.valueOf(100));
                     // 应付金额
                     payAmount = order.getTotalPrice().subtract(order.getTotalPrice().multiply(discount));
                     break;
                 case "fulldown":
+                    discount = new BigDecimal(coupon.getRuleValue());
                     // 满减
                     payAmount = order.getTotalPrice().subtract(discount);
                     break;
@@ -245,6 +247,7 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
             //valueStr = new String(valueStr.getBytes("ISO-8859-1"), "utf-8");
             params.put(name, valueStr);
         }
+
         boolean flag = AliPay.getInstance().rsaCheck(params);
         if (flag) {
             AliPayments payments = new AliPayments(params);
@@ -265,6 +268,9 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
                     // 保存支付宝同步支付通知信息
                     aliPaymentsService.saveSelective(payments);
                     User buyer = userService.selectOnlyByKey(order.getUserUuid());
+
+                    userCouponService.updateCouponExpend(order.getCoupon());
+
                     this.sendPaySucMsg(order, buyer.getPhoneNum());
                     result = "success";
                 }
@@ -336,8 +342,9 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
                 // 下单时保存用户ID在 attach 里，所以可以直接取到
                 order.setUserUuid(wxPayments.getAttach());
                 order = this.selectOnly(order);
+
                 // 验证成功 金额匹配
-                if (wxPayments.getTotalFee().equals(order.getPayPrice().multiply(new BigDecimal(100)))) {
+                if (wxPayments.getTotalFee().toString().equals(String.valueOf(MoneyUtils.yuan2Fen(order.getPayPrice().doubleValue())))) {
                     order.setStatus("waitConsume");
                     order.setPayWay("wxpay");
                     order.setPayTime(DateUtils.getCurrentDate());
@@ -347,10 +354,13 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
                     User buyer = userService.selectOnlyByKey(order.getUserUuid());
                     this.sendPaySucMsg(order, buyer.getPhoneNum());
 
-                    notifyMap.put("return_code", "SUCCESS");
-                    notifyMap.put("return_msg", "OK");
+                    notifyMap.put("return_code", "<![CDATA[SUCCESS]]>");
+                    notifyMap.put("return_msg", "<![CDATA[OK]]>");
                 }
+
                 wxPaymentService.saveSelective(wxPayments);
+
+                userCouponService.updateCouponExpend(order.getCoupon());
             } else {
                 notifyMap.put("return_code", "FAIL");
                 notifyMap.put("return_msg", "签名失败,参数格式校验错误");
@@ -396,6 +406,8 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
             }
 
             result.put("status", "success");
+
+            userCouponService.updateCouponExpend(order.getCoupon());
 
             this.sendPaySucMsg(order, buyer.getPhoneNum());
             return result;
@@ -573,7 +585,7 @@ public class UnionOrderServiceImpl extends BaseServiceImpl<UnionOrders> implemen
     public String weekCount() {
         Map<String, Object> result = new HashMap<>();
         Map<String, Object> titleMap = new HashMap<>();
-        titleMap.put("text", "近七日销量");
+        titleMap.put("subtext", "近七日销量");
         Map<String, Object> legendMap = new HashMap<>();
         legendMap.put("data", new String[]{"支付完成", "订单完成"});
         result.put("title", titleMap);

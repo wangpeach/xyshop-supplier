@@ -16,7 +16,7 @@ public interface ShopService extends BaseService<Shop> {
     /**
      * 商铺逾期 15 天 自动冻结
      */
-    void autoFreeze();
+    void comAutoFreeze();
 
     /**
      * 客户端搜索商家

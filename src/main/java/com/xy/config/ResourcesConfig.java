@@ -23,6 +23,10 @@ public class ResourcesConfig implements EnvironmentAware {
 
     public static String wxCert;
 
+    public static String wxNotifyUrl;
+
+    public static String aliNotifyUrl;
+
 
     /**
      * 文件临时保存路径
@@ -135,6 +139,8 @@ public class ResourcesConfig implements EnvironmentAware {
         ResourcesConfig.DESGOODSURL = baseUrl + env.getProperty("req.desgoods");
         ResourcesConfig.DESADURL = baseUrl + env.getProperty("req.descAd");
 
+        ResourcesConfig.wxNotifyUrl = env.getProperty("wx.notifyUrl");
+        ResourcesConfig.aliNotifyUrl = env.getProperty("ali.notifyUrl");
 
 //        FileUtils.createPath(Config.FILETEMP, Config.SHOPPATH, Config.ICONPATH, Config.HEADPATH,
 //                Config.PRODUCTIMGPATH, Config.JUDGEIMGPATH, Config.APPPATH, Config.ADVIMGPATH,

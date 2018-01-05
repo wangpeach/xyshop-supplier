@@ -8,7 +8,7 @@ public class WXConfig implements WXPayConfig{
     private final String KEY = "6zRDLD5D9ZWAlDW7auujay9kdV5oC0A9";
     private final String WX_APPID = "wx9b1fa09595b5d87c";
     private final String MCH_ID = "1491858182";
-    public static final String notifyUrl = "http://219.141.127.213:8087/xyshop-supplier/order/wx_receive_notify";
+    public static final String notifyUrl = ResourcesConfig.wxNotifyUrl;
 
     private byte[] certData;
     public WXConfig() {

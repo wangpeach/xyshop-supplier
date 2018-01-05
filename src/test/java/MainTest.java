@@ -55,5 +55,11 @@ public class MainTest {
 //        items.sort(Comparator.comparing(User::getCoin));
 //
 //        System.out.println(items.stream().map(User::getName).collect(Collectors.toList()));
+
+        String pub = "+EK4mEdxh5dM7AxtY51Fct1f4jCme5hu7L+wLfi4PCM0r78IOoEs4kABWasB2SkieBvyyV7JwR5gpyL+SvUzEGmf3WCNLmTUU4at3aavkxbE4qWBJbtcb1JJ3p6ZMcsg0QARr3XftEnLrA1JyoG+T1LKEz3BlGM2XwF86+V9cH5FKALd8vbIEceEof53zlfqWhPv5EQaZA47bwJnHicjav3ttPAoRYTErWmVsuCKuaH4chNoYvlzwfFRSg1UMuWGGsCZaO3DxskFnV8/SzlK7A+o1z0umqnodjF4oltsu6fRLY0Fou2CwIDAQAB";
+
+        String pub1 = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuAH4PnWQ13392fTL79nVAKAAPfvJxWd0P+EK4mEdxh5dM7AxtY51Fct1f4jCme5hu7L+wLfi4PCM0r78IOoEs4kABWasB2SkieBvyyV7JwR5gpyL+SvUzEGmf3WCNLmTUU4at3aavkxbE4qWBJbtcb1JJ3p6ZMcsg0QARr3XftEnLrA1JyoG+T1LKEz3BlGM2XwF86+V9cH5FKALd8vbIEceEof53zlfqWhPv5EQaZA47bwJnHicjav3ttPAoRYTErWmVsuCKuaH4chNoYvlzwfFRSg1UMuWGGsCZaO3DxskFnV8/SzlK7A+o1z0umqnodjF4oltsu6fRLY0Fou2CwIDAQAB";
+
+        System.out.println(pub.equals(pub1));
     }
 }

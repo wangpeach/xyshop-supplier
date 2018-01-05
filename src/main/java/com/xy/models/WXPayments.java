@@ -1,8 +1,11 @@
 package com.xy.models;
 
+import com.xy.utils.StringUtils;
+
 import javax.persistence.*;
 import java.util.Map;
 
+@Table(name = "wxpayments")
 public class WXPayments {
 
     public WXPayments() {
@@ -21,18 +24,25 @@ public class WXPayments {
         this.isSubscribe = arg.get("is_subscribe");
         this.tradeType = arg.get("trade_type");
         this.bankType = arg.get("bank_type");
-        this.totalFee = Integer.parseInt(arg.get("total_fee"));
+        this.totalFee = setIntValue(arg.get("total_fee"));
         this.feeType = arg.get("fee_type");
-        this.cashFee = Integer.parseInt(arg.get("cash_fee"));
+        this.cashFee = setIntValue(arg.get("cash_fee"));
         this.cashFeeType = arg.get("cash_fee_type");
-        this.couponFee = Integer.parseInt(arg.get("coupon_fee"));
-        this.couponCount = Integer.parseInt(arg.get("coupon_count"));
+        this.couponFee = setIntValue(arg.get("coupon_fee"));
+        this.couponCount = setIntValue(arg.get("coupon_count"));
         this.couponIdN = arg.get("coupon_id_$n");
-        this.couponFeeN = Integer.parseInt(arg.get("coupon_fee_$n"));
+        this.couponFeeN = setIntValue(arg.get("coupon_fee_$n"));
         this.transactionId = arg.get("transaction_id");
         this.outTradeNo = arg.get("out_trade_no");
         this.attach = arg.get("attach");
         this.timeEnd = arg.get("time_end");
+    }
+
+    private int setIntValue(String value){
+        if(StringUtils.isNotNull(value)) {
+            return Integer.parseInt(value);
+        }
+        return 0;
     }
 
     /**

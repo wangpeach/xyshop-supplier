@@ -200,15 +200,23 @@ public class ShopServiceImpl extends BaseServiceImpl<Shop> implements ShopServic
 
 
     @Override
-    public void autoFreeze() {
+    public void comAutoFreeze() {
         Condition condition = new Condition(Shop.class);
-        condition.createCriteria().andLessThan(" TIMESTAMPDIFF(day, now(), endTime)", -Config.SHOP_OVERDUE);
+        Example.Criteria criteria = condition.createCriteria();
+        criteria.andCondition(String.format(" TIMESTAMPDIFF(day, now(), TIMESTAMPADD(DAY, %s, endTime)) < 0", Config.SHOP_OVERDUE));
+        criteria.andEqualTo("status", "online");
         List<Shop> shops = super.selectListByCondition(condition);
         if (shops != null && !shops.isEmpty()) {
-            shops.forEach(shop -> {
-                shop.setStatus("freeze");
-                super.updateByPrimaryKeySelective(shop);
-            });
+
+            Shop shop = new Shop();
+            shop.setStatus("freeze");
+
+            List<String> uuids = new ArrayList<>();
+            shops.forEach(item -> uuids.add(item.getUuid()));
+
+            condition.clear();
+            condition.createCriteria().andIn("uuid", uuids);
+            super.updateByConditionSelective(shop, condition);
         }
     }
 

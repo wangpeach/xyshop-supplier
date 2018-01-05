@@ -3,6 +3,7 @@ package com.xy.models;
 import javax.persistence.*;
 import java.util.Map;
 
+@Table(name = "alipayments")
 public class AliPayments {
 
     public AliPayments() {}

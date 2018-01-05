@@ -10,7 +10,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="renderer" content="webkit">
-    <title>XXXX-联盟店铺登录</title>
+    <title>商家管理平台</title>
     <meta name="keywords" content="XXXX,联盟店铺">
     <link href="assets/img/favicon.ico" rel="shortcut icon" type="image/x-icon">
     <link href="assets/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
@@ -29,7 +29,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 <body class="gray-bg signin">
     <div class="middle-box text-center loginscreen  animated fadeInDown">
         <div>
-            <h3>XXXX-联盟店铺登录</h3>
+            <h3>商家管理平台</h3>
             <form class="m-t" role="form" method="POST" id="login" action="index.html">
                 <div class="form-group">
                     <input  class="form-control" placeholder="店铺名称或店主手机号" id="adminEmail"  name="adminEmail" autofocus  required="">
