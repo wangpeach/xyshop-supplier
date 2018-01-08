@@ -20,6 +20,7 @@ public class UserCoupon {
         this.addTime = DateUtils.getCurrentDate();
     }
 
+    @Id
     private String uuid;
 
     /**

@@ -1,5 +1,6 @@
 package com.xy.services.impl;
 
+import com.alibaba.druid.sql.visitor.functions.Char;
 import com.xy.config.Config;
 import com.xy.config.CouponConfig;
 import com.xy.models.*;
@@ -52,10 +53,8 @@ public class UserCouponServiceImpl extends BaseServiceImpl<UserCoupon> implement
 
     @Override
     public UserCoupon selectOnlyByKey(Object key) {
-        UserCoupon userCoupon = new UserCoupon();
-        userCoupon.setCouponid(key.toString());
-        userCoupon = super.selectOnly(userCoupon);
-        userCoupon.setCoupon(couponService.selectOnlyByKey(key));
+        UserCoupon userCoupon = super.selectOnlyByKey(key);
+        userCoupon.setCoupon(couponService.selectOnlyByKey(userCoupon.getCouponid()));
         return userCoupon;
     }
 
@@ -64,33 +63,46 @@ public class UserCouponServiceImpl extends BaseServiceImpl<UserCoupon> implement
     public List<UserCoupon> selectList(String userId, String shopId, String cate, String goodId) {
         UserCoupon userCoupon = new UserCoupon();
         userCoupon.setUserid(userId);
-        userCoupon.setStatus("waituser");
+        userCoupon.setStatus("waituse");
 
-        List<UserCoupon> result = new ArrayList<>();
-
+        List<String> debarCoupons = new ArrayList<>();
         List<UserCoupon> userCoupons = super.selectList(userCoupon);
 
         if (userCoupons != null && userCoupons.size() > 0) {
             // 查询优惠卷信息
             Condition cond = new Condition(Coupon.class);
-            cond.createCriteria().andIn("uuid", userCoupons.stream().map(UserCoupon::getCoupon).collect(Collectors.toList()));
+            cond.createCriteria().andIn("uuid", userCoupons.stream().map(UserCoupon::getCouponid).collect(Collectors.toList()));
             List<Coupon> coupons = couponService.selectListByCondition(cond);
 
 
             for (UserCoupon item : userCoupons) {
-                Coupon coupon = coupons.stream().filter(arg -> arg.getUuid().equals(item.getCoupon())).collect(Collectors.toList()).get(0);
-                item.setCoupon(coupon);
+                Coupon coupon = coupons.stream().filter(arg -> arg.getUuid().equals(item.getCouponid())).collect(Collectors.toList()).get(0);
+                // 优惠卷所属店铺
+                if(!Config.lord.equals(coupon.getAuthor())) {
+                    Shop shop = shopService.selectOnlyByKey(coupon.getAuthor());
+                    if(shop != null) {
+                        coupon.setShopName(shop.getName());
+                    }
+                } else {
+                    coupon.setShopName("所有店铺");
+                }
+
                 // 根据参数判断该订单是否可用优惠卷
                 boolean legal = (coupon.getToGoods().equals("good") && coupon.getToGoodsValue().equals(goodId)) || (coupon.getToGoods().equals("cate") && coupon.getToGoodsValue().equals(cate)) || coupon.getToGoods().equals("all");
+
+
                 if (legal) {
                     legal = StringUtils.isNull(shopId) || (StringUtils.isNotNull(shopId) && coupon.getAuthor().equals(shopId));
                     if (legal) {
-                        result.add(item);
+                        item.setCoupon(coupon);
                         break;
+                    } else {
+                        debarCoupons.add(item.getUuid());
                     }
                 }
             }
         }
+        userCoupons.removeIf(e -> debarCoupons.contains(e.getUuid()));
         return userCoupons;
     }
 
@@ -186,10 +198,12 @@ public class UserCouponServiceImpl extends BaseServiceImpl<UserCoupon> implement
             coupons = this.selectByCond(null, null, good.getUuid());
             if (coupons == null || coupons.isEmpty()) {
                 coupons = this.selectByCond(null, good.getCatId(), null);
+                coupons.removeIf(e -> !e.getAuthor().equals(shop.getUuid()) || e.getToGoods().equals("good"));
             }
         }
         if (coupons == null || coupons.isEmpty()) {
             coupons = this.selectByCond(shop.getUuid(), null, null);
+            coupons.removeIf(e -> e.getToGoods().equals("good"));
         }
 
         if (coupons != null && coupons.size() > 0) {
@@ -315,6 +329,13 @@ public class UserCouponServiceImpl extends BaseServiceImpl<UserCoupon> implement
     @Override
     public void updateCouponExpend(String id) {
         if (StringUtils.isNotNull(id)) {
+
+            UserCoupon userCoupon = new UserCoupon();
+            userCoupon.setStatus("used");
+            Condition cond = new Condition(UserCoupon.class);
+            cond.createCriteria().andEqualTo("couponid", id);
+            super.updateByConditionSelective(userCoupon, cond);
+
             sqlService.exec("UPDATE coupon SET used = IFNULL(used, 0)+1 WHERE uuid = '%s'", id);
         }
     }

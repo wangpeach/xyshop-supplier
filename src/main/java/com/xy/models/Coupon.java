@@ -56,6 +56,9 @@ public class Coupon {
      */
     private String rule;
 
+    @Transient
+    private String ruleText;
+
     /**
      * 优惠值，返券->指定优惠卷uuid；折扣->输入折扣比例（例如，9折=90,8.5折=85）；满减->输入优惠金额
      */
@@ -113,6 +116,9 @@ public class Coupon {
      */
     @Column(name = "add_time")
     private String addTime;
+
+    @Transient
+    private String shopName;
 
     /**
      * @return uuid
@@ -468,5 +474,21 @@ public class Coupon {
      */
     public void setAddTime(String addTime) {
         this.addTime = addTime == null ? null : addTime.trim();
+    }
+
+    public String getRuleText() {
+        return ruleText;
+    }
+
+    public void setRuleText(String ruleText) {
+        this.ruleText = ruleText;
+    }
+
+    public String getShopName() {
+        return shopName;
+    }
+
+    public void setShopName(String shopName) {
+        this.shopName = shopName;
     }
 }
