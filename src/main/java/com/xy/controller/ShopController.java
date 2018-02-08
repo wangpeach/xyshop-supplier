@@ -182,6 +182,8 @@ public class ShopController {
         return shopService.mApiList(user, cates, key, position, distance, orderBy, offset, Config.LIMIT);
     }
 
+
+
     @ResponseBody
     @RequestMapping(value = {"only"})
     public Shop only(@ModelAttribute Shop shop) {

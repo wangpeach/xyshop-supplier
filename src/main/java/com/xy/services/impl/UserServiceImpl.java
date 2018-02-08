@@ -63,7 +63,7 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
     @Override
     public PageInfo<User> selectPageListByParams(ParamsPojo pj) {
         PageInfo<User> pi = super.selectPageInfoByCondition(this.createCond(pj), pj.getStart(), pj.getLength());
-        this.handleResult(this.handleResult(pi.getList()));
+        this.handleResult(pi.getList());
         return pi;
     }
 
@@ -77,6 +77,8 @@ public class UserServiceImpl extends BaseServiceImpl<User> implements UserServic
         args.forEach(s -> {
             if(StringUtils.isNotNull(s.getHeadImg())) {
                 s = this.handleResult(s);
+            } else {
+                s.setHeadImg("");
             }
         });
         return args;

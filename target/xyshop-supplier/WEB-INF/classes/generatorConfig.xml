@@ -25,18 +25,18 @@
 		<javaTypeResolver>
 			<property name="forceBigDecimals" value="false"></property>
 		</javaTypeResolver>
-		<javaModelGenerator targetPackage="com.xy.models" targetProject="E:\\IdeaProjects\\xyshop-supplier/src/main/java/">
+		<javaModelGenerator targetPackage="com.xy.models" targetProject="E:\\IdeaProjects\\xy\\xyshop-supplier/src/main/java/">
 			<property name="enableSubPackages" value="true"></property>
 			<property name="trimStrings" value="true"></property>
 		</javaModelGenerator>
 		
-		<sqlMapGenerator targetPackage="mapper" targetProject="E:\\IdeaProjects\\xyshop-supplier/src/main/java/">
+		<sqlMapGenerator targetPackage="mapper" targetProject="E:\\IdeaProjects\\xy\\xyshop-supplier/src/main/java/">
 			<property name="enableSubPackages" value="true"></property>
 		</sqlMapGenerator>
 		
 		<javaClientGenerator type="XMLMAPPER" 
 			targetPackage="com.xy.mapper"
-			targetProject="E:\\IdeaProjects\\xyshop-supplier/src/main/java/">
+			targetProject="E:\\IdeaProjects\\xy\\xyshop-supplier/src/main/java/">
 			<property name="enableSubPackages" value="true"></property>
 		</javaClientGenerator>
 		<!-- 配置要生成的文件，根据数据表生成底层代码 -->
@@ -60,6 +60,10 @@
 		<!--<table tableName="user_coupon" domainObjectName="UserCoupon"></table>-->
 		<!--<table tableName="user_collect" domainObjectName="UserCollect"></table>-->
 		<!--<table tableName="user_footprint" domainObjectName="UserFootprint"></table>-->
-		<table tableName="ad" domainObjectName="Ad"></table>
+		<!--<table tableName="ad" domainObjectName="Ad"></table>-->
+		<!--<table tableName="alipayments" domainObjectName="AliPayments"></table>-->
+		<!--<table tableName="wxpayments" domainObjectName="WXPayments"></table>-->
+		<!--<table tableName="platform_money_record" domainObjectName="PlatformMoneyRecord"></table>-->
+		<table tableName="search_record" domainObjectName="SearchRecord"></table>
 	</context>
 </generatorConfiguration>

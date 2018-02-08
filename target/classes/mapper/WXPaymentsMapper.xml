@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xy.mapper.WXPaymentsMapper">
+  <resultMap id="BaseResultMap" type="com.xy.models.WXPayments">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <result column="appid" jdbcType="VARCHAR" property="appid" />
+    <result column="mch_id" jdbcType="VARCHAR" property="mchId" />
+    <result column="device_info" jdbcType="VARCHAR" property="deviceInfo" />
+    <result column="nonce_str" jdbcType="VARCHAR" property="nonceStr" />
+    <result column="sign" jdbcType="VARCHAR" property="sign" />
+    <result column="result_code" jdbcType="VARCHAR" property="resultCode" />
+    <result column="err_code" jdbcType="VARCHAR" property="errCode" />
+    <result column="err_code_des" jdbcType="VARCHAR" property="errCodeDes" />
+    <result column="openid" jdbcType="VARCHAR" property="openid" />
+    <result column="is_subscribe" jdbcType="VARCHAR" property="isSubscribe" />
+    <result column="trade_type" jdbcType="VARCHAR" property="tradeType" />
+    <result column="bank_type" jdbcType="VARCHAR" property="bankType" />
+    <result column="total_fee" jdbcType="INTEGER" property="totalFee" />
+    <result column="fee_type" jdbcType="VARCHAR" property="feeType" />
+    <result column="cash_fee" jdbcType="INTEGER" property="cashFee" />
+    <result column="cash_fee_type" jdbcType="VARCHAR" property="cashFeeType" />
+    <result column="coupon_fee" jdbcType="INTEGER" property="couponFee" />
+    <result column="coupon_count" jdbcType="INTEGER" property="couponCount" />
+    <result column="coupon_id_$n" jdbcType="VARCHAR" property="couponIdN" />
+    <result column="coupon_fee_$n" jdbcType="INTEGER" property="couponFeeN" />
+    <result column="transaction_id" jdbcType="VARCHAR" property="transactionId" />
+    <result column="out_trade_no" jdbcType="VARCHAR" property="outTradeNo" />
+    <result column="attach" jdbcType="VARCHAR" property="attach" />
+    <result column="time_end" jdbcType="VARCHAR" property="timeEnd" />
+  </resultMap>
+</mapper>

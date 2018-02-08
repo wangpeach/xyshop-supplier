@@ -54,7 +54,7 @@ public class UnionOrders {
     private BigDecimal payPrice;
 
     /**
-     * 支付方式：coin(金币支付)、weixin（微信支付）、alipay（支付宝）
+     * 支付方式：coin(金币支付)、wxpay（微信支付）、alipay（支付宝）
      */
     @Column(name = "pay_way")
     private String payWay;
@@ -234,7 +234,7 @@ public class UnionOrders {
      * @param orderNo 订单号
      */
     public void setOrderNo(String orderNo) {
-        this.orderNo = orderNo == null ? null : orderNo.trim();
+        this.orderNo = orderNo == null ? null : orderNo.trim().replace(" ", "");
     }
 
     /**
@@ -396,7 +396,7 @@ public class UnionOrders {
      * @param cardCode 密码串码，用于核销
      */
     public void setCardCode(String cardCode) {
-        this.cardCode = cardCode == null ? null : cardCode.trim();
+        this.cardCode = cardCode == null ? null : cardCode.trim().replace(" ", "");
     }
 
     /**

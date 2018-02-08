@@ -28,4 +28,49 @@
     <result column="stock" jdbcType="INTEGER" property="stock" />
     <result column="rebut" jdbcType="VARCHAR" property="rebut" />
   </resultMap>
+
+
+
+  <sql id="shopDetails_Column_List">
+    goods.uuid, goods.shop_uuid, goods.good_no, goods.brand_id, goods.brand_name, goods.cat_id, goods.cat_name, goods.name, goods.thumb_img, goods.more_img, goods.des_file, goods.sale_num, goods.status, goods.if_coin, goods.shop_name, goods.org_price, goods.price, goods.balance, goods.stock, goods.rebut, goods.update_time, goods.add_time,
+    <include refid="range_term" />
+    as torange
+  </sql>
+
+  <sql id="range_term">
+    (2 * ASIN(SQRT(POWER(SIN((latitude - #{lat, jdbcType=DECIMAL}) * 3.14159265359 / 180 / 2), 2) +
+    COS(latitude * 3.14159265359 / 180) * COS(#{lat, jdbcType=DECIMAL} * 3.14159265359 / 180) *
+    POWER(SIN((longitude - #{log, jdbcType=DECIMAL}) * 3.14159265359 / 180 / 2), 2))) * 6378.137 * 1000)
+  </sql>
+
+  <select id="searchShopDetails" parameterType="Map" resultMap="BaseResultMap">
+    SELECT
+    <include refid="shopDetails_Column_List" />
+    FROM shop
+    INNER JOIN union_goods as goods ON shop.uuid = goods.shop_uuid
+    WHERE 1=1
+    <if test="name != null and name != ''">
+      AND
+      shop.status = 'online' AND
+      (
+      (shop.name LIKE concat(concat('%',#{name}),'%') OR shop.shop_cat_name LIKE concat(concat('%',#{name}),'%'))
+      OR
+      ((goods.name LIKE concat(concat('%',#{name}),'%')) AND goods.status='online')
+      )
+    </if>
+    <if test="shopCatId != null and shopCatId != ''">
+      AND shop_cat_id = #{shopCatId, jdbcType=VARCHAR}
+    </if>
+    <if test="distance != null and distance != ''">
+      and <include refid="range_term" /> &lt;= #{distance,jdbcType=DECIMAL}
+    </if>
+    <if test="orderBy == 0">
+      ORDER BY torange DESC
+    </if>
+    <if test="orderBy == 1">
+      ORDER BY total_sale_num desc
+    </if>
+    LIMIT #{offset,jdbcType=INTEGER},#{limit,jdbcType=INTEGER}
+  </select>
+
 </mapper>

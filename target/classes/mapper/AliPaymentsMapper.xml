@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xy.mapper.AliPaymentsMapper">
+  <resultMap id="BaseResultMap" type="com.xy.models.AliPayments">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <result column="notify_time" jdbcType="VARCHAR" property="notifyTime" />
+    <result column="notify_type" jdbcType="VARCHAR" property="notifyType" />
+    <result column="notify_id" jdbcType="VARCHAR" property="notifyId" />
+    <result column="app_id" jdbcType="VARCHAR" property="appId" />
+    <result column="charset" jdbcType="VARCHAR" property="charset" />
+    <result column="version" jdbcType="VARCHAR" property="version" />
+    <result column="sign_type" jdbcType="VARCHAR" property="signType" />
+    <result column="sign" jdbcType="VARCHAR" property="sign" />
+    <result column="trade_no" jdbcType="VARCHAR" property="tradeNo" />
+    <result column="out_trade_no" jdbcType="VARCHAR" property="outTradeNo" />
+    <result column="out_biz_no" jdbcType="VARCHAR" property="outBizNo" />
+    <result column="buyer_id" jdbcType="VARCHAR" property="buyerId" />
+    <result column="buyer_logon_id" jdbcType="VARCHAR" property="buyerLogonId" />
+    <result column="seller_id" jdbcType="VARCHAR" property="sellerId" />
+    <result column="seller_email" jdbcType="VARCHAR" property="sellerEmail" />
+    <result column="trade_status" jdbcType="VARCHAR" property="tradeStatus" />
+    <result column="total_amount" jdbcType="VARCHAR" property="totalAmount" />
+    <result column="receipt_amount" jdbcType="VARCHAR" property="receiptAmount" />
+    <result column="invoice_amount" jdbcType="VARCHAR" property="invoiceAmount" />
+    <result column="buyer_pay_amount" jdbcType="VARCHAR" property="buyerPayAmount" />
+    <result column="point_amount" jdbcType="VARCHAR" property="pointAmount" />
+    <result column="refund_fee" jdbcType="VARCHAR" property="refundFee" />
+    <result column="subject" jdbcType="VARCHAR" property="subject" />
+    <result column="body" jdbcType="VARCHAR" property="body" />
+    <result column="gmt_create" jdbcType="VARCHAR" property="gmtCreate" />
+    <result column="gmt_payment" jdbcType="VARCHAR" property="gmtPayment" />
+    <result column="gmt_refund" jdbcType="VARCHAR" property="gmtRefund" />
+    <result column="gmt_close" jdbcType="VARCHAR" property="gmtClose" />
+    <result column="fund_bill_list" jdbcType="VARCHAR" property="fundBillList" />
+    <result column="passback_params" jdbcType="VARCHAR" property="passbackParams" />
+    <result column="voucher_detail_list" jdbcType="LONGVARCHAR" property="voucherDetailList" />
+  </resultMap>
+</mapper>

@@ -25,8 +25,6 @@ public class AliPay {
     private static final String ali_public_key = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuAH4PnWQ13392fTL79nVAKAAPfvJxWd0P+EK4mEdxh5dM7AxtY51Fct1f4jCme5hu7L+wLfi4PCM0r78IOoEs4kABWasB2SkieBvyyV7JwR5gpyL+SvUzEGmf3WCNLmTUU4at3aavkxbE4qWBJbtcb1JJ3p6ZMcsg0QARr3XftEnLrA1JyoG+T1LKEz3BlGM2XwF86+V9cH5FKALd8vbIEceEof53zlfqWhPv5EQaZA47bwJnHicjav3ttPAoRYTErWmVsuCKuaH4chNoYvlzwfFRSg1UMuWGGsCZaO3DxskFnV8/SzlK7A+o1z0umqnodjF4oltsu6fRLY0Fou2CwIDAQAB";
     private static final String app_private_key = "MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDOPjgnhnjD2krqFMS3KcXaO96Fkr0EgGobFxmB9F93XvCwf42SMJOOFVpypCyS+8h4D7+KyM3DGw9It3LIpBXRVweuUJDdv8+CdRV8veXAsx2K+/PH3Gx+Xt2qGOvRBNtV3VK+EJdAF26ZiZoQv6tfgoo2xqTj6Ux6lRa3f3iijOoNE3DL/8H4XRFJRw9AQcgmrY/3oc2+s47AlPrWbkjh6JlhWkiO6SOIC6J8EYFRgArdVgwrLv2fbh0dQgydHTVoCaZmy+I/hGISGACGfuicOYNjtQmRe3bjIXgAj/tE8NIHxmEWSdSPmzTiQUbVot/kShli7Qa7w6gl5dRw7OFjAgMBAAECggEBAMKmTF9Zdc76zmuAsGxiO36NtKWCaWy/OeVZdtSE7DkAXM9ngxjvScP2eUfrlLogcgKGcnOssy4p8tHhea7N1l2d8vzcwuzWpCVvFZmGrDmjkwViZ6FAcxENvc1U+fNqzwuJ+Ba0F9wAgXzdNpAKJdbdoE60SllkDa8/2JHU9+kIvemcUAeQLgHDXv88/EiUx/706sZ4LizCtPDsCA7UvOR0f5HTnnF6hl3eitgUuanK5DhXtF9cYHz6dE0flad0OvQc8My/mz5Qf29mR7tUevSETWHPeMMExutb/B9o5wc2mTn/2Z91opAIwKhlYuG/ByYWtA1Fruvv21cxqmH/tCkCgYEA6jiZ49ny09JvT56ccL6d6bezAqRGhvmRNvFjIBVit8XqZBJrCr9sXlM8+C5h5Uz3vOJ0paLzBMAWLbhiBMSHF1qdKULLVPGN+D99G/Dy80KcvwS047BB/aIHbVyp/ELQaACyLzvYGj6QU4bhys0ZcMfj0zUZON1F1VLGLyp6Xl0CgYEA4Wug7uRM5uwGVG+VpC68EPpporjKoz+oKVCqjTWRIwT3jHmnqLQ8w4QYdCovSzvL0DIEuxrlMZCbOSuzmu6ibtMg6wL/UIJmDj0dgptddAHLFMe1t3yJXbShNLsMAFctYzu7oy6Poo+brdggOamK3dMWuIbyMeX2iTPk2Ma2wr8CgYAUkGeig644Ps+bE/f0RigjLwe+gaHXk+3V/xeO55HFRNExfBR92xSuq2w89gWOVlWh9df7+vSPRDYuSXQBqyeZO1F1H/IuQQ8P7rMTUvJhvUV51/Xxz7XbiPBR/8LE7TDTEMyULRLqKvgM/Vixr5Q+PK6aCp1uSq8o7Z2M4pPf2QKBgQCqLx2S/d1pQawNtyiciYQGtWdnKGgkE30bpAD/Fv/6FlfmQDppzZlKasIjgW2vOPfIuNqFf+qlHu1xniK8x4jubosdomerGqd9/Hn5Dt7hJDF0AMqaOnViv2ota0HGSArGLmSc8BwUuKLp/o9luTBUBHfU3Fyhe2JDd2BAoNV99QKBgFL1vUJkI6X6nOI6uPqZI+xcGuRnsDwjRjEFCc6IrBoeHlGBgor4YxaS4mZkgV0ZmtNQf/FRIFC5mfZu7egLdLQCTkmcOVwxVVj8xfBJu2XS2+DTpk7Epy6dD2dE1U/CPv2LbOq8bB2x19NeLVwL5tPiFCwe5dTLDLl6/67yYAJb";
 
-    private static final String ali_content_key = "WeO21vZwMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuAH4PnWQ13392fTL79nVAKAAPfvJxWd0PcpUXlLYxlQM98w==";
-
     private static final String format = "json";
     private static final String charset = "utf-8";
     private static final String sign_typesign_type = "RSA2";
@@ -83,6 +81,7 @@ public class AliPay {
         try {
             AlipayTradeAppPayResponse response = client.sdkExecute(request);
             str = response.getBody();
+
         } catch (AlipayApiException e) {
             e.printStackTrace();
         }

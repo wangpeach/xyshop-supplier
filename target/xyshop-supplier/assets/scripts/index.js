@@ -51,10 +51,24 @@ define(function(require) {
         });
     });
 
-    $.post('params/sysparam-type', {'_type': 'other'}, function(data, textStatus, xhr) {
-    	/*optional stuff to do after success */
-    	for (var i = 0; i < data.length; i++) {
-    		$("#" + data[i].key).text(data[i].value);
-    	}
-    }, 'json');
+    jQuery(document).ready(function($) {
+        $(".shopMenus").show('400');
+        /**
+         * 官方联系方式
+         */
+        $.post('/xyshop/params/search', {
+            'type': 'contact_us'
+        }, function(data, textStatus, xhr) {
+            /*optional stuff to do after success */
+            if (data && data.length > 0) {
+                var eles = new Array();
+                eles.push('<span class="block m-t-xs" style="margin-bottom: 15px;"><strong class="font-bold">官方联系方式</strong></span>');
+                for (var i = 0; i < data.length; i++) {
+                    eles.push('<p>' + data[i].name + '：<span id="lx_phone">' + data[i].paramValue + '</span></p>');
+                }
+                $(".contactUs").append(eles.join(' '));
+                $(".contactUsLi").show();
+            }
+        }, 'json');
+    });
 });

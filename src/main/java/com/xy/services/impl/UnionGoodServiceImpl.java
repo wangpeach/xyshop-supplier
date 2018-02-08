@@ -3,27 +3,39 @@ package com.xy.services.impl;
 import com.github.pagehelper.PageInfo;
 import com.xy.config.Config;
 import com.xy.config.ResourcesConfig;
+import com.xy.mapper.ShopMapper;
+import com.xy.mapper.UnionGoodsMapper;
+import com.xy.models.SearchRecord;
+import com.xy.models.Shop;
 import com.xy.models.UnionGoods;
+import com.xy.services.SearchRecrodService;
 import com.xy.services.UnionGoodService;
 import com.xy.utils.*;
 import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Condition;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by rjora on 2017/7/16 0016.
  */
 @Service
 public class UnionGoodServiceImpl extends BaseServiceImpl<UnionGoods> implements UnionGoodService {
+
+
+    @Autowired
+    private SearchRecrodService searchRecrodService;
+
+    @Autowired
+    private UnionGoodsMapper goodsMapper;
+
 
     @Override
     public int saveSelective(UnionGoods entity) {
@@ -146,6 +158,48 @@ public class UnionGoodServiceImpl extends BaseServiceImpl<UnionGoods> implements
             e.printStackTrace();
         }
         return entity;
+    }
+
+    @Override
+    public PageInfo<UnionGoods> selectPageInfo(UnionGoods entity, int offset, int limit) {
+         PageInfo<UnionGoods> result = super.selectPageInfo(entity, (offset-1) * limit, limit);
+         result.setList(this.handleResult(result.getList()));
+         return result;
+    }
+
+    @Override
+    public List<UnionGoods> mApiList(String user, String cats, String key, String position, String distance, String orderBy, int offset, int limit) {
+        // 计算距离
+
+        String[] latlng = position.split(",");
+
+        // 关键字搜索
+        if (StringUtils.isNotNull(key)) {
+            // 添加用户搜索记录
+            SearchRecord record = new SearchRecord();
+            if(StringUtils.isNull(user)){
+                user = "游客";
+            }
+            // 所有关键字记录
+            record.setUuid(StringUtils.getUuid());
+            record.setUserUuid(user);
+            record.setKeyWord(key);
+            record.setAddTime(DateUtils.getCurrentDate());
+            searchRecrodService.saveSelective(record);
+        }
+        Map<String, Object> args = new HashMap<>();
+        args.put("name", key);
+        args.put("shopCatId", cats);
+        args.put("distance", distance);
+        args.put("lat", latlng[1]);
+        args.put("log", latlng[0]);
+        args.put("orderBy", orderBy);
+        args.put("offset", (offset-1) * limit);
+        args.put("limit", limit);
+
+        List<UnionGoods> goods = goodsMapper.searchShopDetails(args);
+//        super.selectPageInfoByCondition(cond, offset, limit).getList()
+        return this.handleResult(goods);
     }
 
     /**

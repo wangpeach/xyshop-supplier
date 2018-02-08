@@ -14,17 +14,13 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 <body class="gray-bg">
     <input type="hidden" id="js-shop-uuid" value="${_loginshop_.uuid }">
     <input type="hidden" id="js-shop-name" value="${_loginshop_.name }">
-    <div class="row wrapper border-bottom white-bg page-heading">
+    <div class="row wrapper border-bottom">
     	<div>
     		<div class="col-sm-12" style="background: #ececec; padding-bottom: 1.2rem; margin-bottom: 2rem;">
              <h2 id="shopName" style="color: darkorange;"></h2>
              			【<span>上次登录时间： </span> <span id="lastTime" style="color: slategrey;">${lastTime }</span>】 【
              <span>上次登录Ip： </span> <span id="lastIp" style="color: slategrey;">${lastIp}</span>】 【
              <span>合同到期日期： </span> <span id="endTime" style="color: slategrey;">${end}</span>】
-         </div>
-         <div class="col-sm-12">
-             <p>XXXX对合作商家的核心价值： 1. 发掘新顾客，增加销售额 2. 增强老顾客的忠诚度，吸引高质量会员 3. 提高服务质量，降低服务成本 4. 建立企业与顾客间低成本、高到达率的沟通渠道 5. 开展精准营销，提升营销效能 </p>
-             <p>顾客忠诚度--这是一组来自麦肯锡（Mckinsey）的数据报告： 1. 顾客的忠诚度不仅可以带来高额利润，而且还可以降低营销成本。 2. 保持一个消费者的营销费用仅是吸引一个新消费者的1/5； 3. 向现有客户销售的机率是50%，而向一个新客户销售产品的机率仅有15%； 4. 客户忠诚度下降5％，企业利润下降25％； 5. 如果将每年的客户关系保持率增加5个百分点，可能使利润增长85％； 6. 企业60％ 的新客户来自现有客户的推荐……</p>
          </div>
     	</div>
     </div>
@@ -114,8 +110,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                 <div class="panel panel-info">
                     <div class="panel-heading">
                         <span style="font-size: 16px">订单核销</span>
-                        <label for="search-write-off" style="margin-left: 20px;">消费码</label>
-                        <input type="text" id="search-write-off" style="color: #585757; font-size: 14px; padding: 0px; border: 1px solid #cacaca;">
+                        <label for="search-write-off" style="margin-left: 20px;">序列码</label>
+                        <input type="text" id="search-write-off" class="form-control" style="color: #585757; font-size: 14px; padding: 0px; border: 1px solid #cacaca; width: 180px; display: inline-block;">
                         <span style="font-size: 22px" id="formatCard"></span>
                     </div>
                     <div class="panel-body">
@@ -127,9 +123,10 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                                         <th>购买用户名</th>
                                         <th>购买产品</th>
                                         <th>购买数量</th>
-                                        <th>消费金额</th>
+                                        <th>订单金额</th>
+                                        <th>实际支付金额</th>
+                                        <%--<th>优惠金额</th>--%>
                                         <th>支付方式</th>
-                                        <th>下单类型</th>
                                         <th>购买时间</th>
                                         <th>操作</th>
                                     </tr>
@@ -138,9 +135,10 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                                         <td id="js-buy-user">--</td>
                                         <td id="js-goods-name">--</td>
                                         <td id="js-buy-num">--</td>
-                                        <td id="js-buy-price">--</td>
+                                        <td id="js-order-price">--</td>
+                                        <td id="js-pay-price">--</td>
+                                        <%--<td id="js-favourable-price">--</td>--%>
                                         <td id="js-pay-why">--</td>
-                                        <td id="js-buy-type">--</td>
                                         <td id="js-buy-time">--</td>
                                         <td id="js-action">--</td>
                                     </tr>
@@ -165,12 +163,6 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                 </div>
                 <table id="cointable"></table>
             </div>
-            <!-- <div class="col-sm-12">
-                <div id="score-toolbar" class="btn-group">
-                    <label>店铺积分记录</label>
-                </div>
-                <table id="scoretable"></table>
-            </div> -->
         </div>
     </div>
     <!-- 店铺提现:开始 -->
@@ -179,7 +171,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="myModalLabel">申请提现金额</h4>
+                    <h4 class="modal-title">申请提现金额</h4>
                 </div>
                 <div class="modal-body">
                     <input type="hidden" id="js-update-uuid">
@@ -202,7 +194,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="myModalLabel">修改店铺结算信息(银行卡帐号不能都为空)</h4>
+                    <h4 class="modal-title" >修改店铺结算信息(银行卡帐号不能都为空)</h4>
                 </div>
                 <div class="modal-body">
                     <input type="hidden" id="js-update-uuid">

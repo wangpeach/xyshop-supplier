@@ -3,6 +3,7 @@ package com.xy.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageInfo;
 import com.xy.config.Config;
+import com.xy.models.Shop;
 import com.xy.models.UnionGoods;
 import com.xy.pojo.ParamsPojo;
 import com.xy.services.UnionGoodService;
@@ -62,6 +63,7 @@ public class UnionGoodsController {
 
         return goodService.selectPageInfoByCondition(cond, pj.getStart(), pj.getLength());
     }
+
 
 
     /**
@@ -176,7 +178,7 @@ public class UnionGoodsController {
 
 
     @ResponseBody
-    @RequestMapping(value = {"mapi/list"})
+    @RequestMapping(value = {"mapi/hots"})
     public List<UnionGoods> list(@RequestParam String shop, @RequestParam String key, @RequestParam int offset) {
         Condition cond = new Condition(UnionGoods.class);
         Example.Criteria cri = cond.createCriteria();
@@ -190,10 +192,32 @@ public class UnionGoodsController {
         return goodService.selectPageInfoByCondition(cond, offset, Config.LIMIT).getList();
     }
 
+    /**
+     * 客户端搜索商10家
+     *
+     * @param
+     * @param key
+     * @param position 用户坐标
+     * @param distance 搜索周围距离
+     * @param orderBy  排序方式
+     * @return
+     */
+    @PostMapping("mapi/list")
+    public List<UnionGoods> mApiList(@RequestParam String user, @RequestParam String cates, @RequestParam String key, @RequestParam String position, @RequestParam String distance, @RequestParam String orderBy, @RequestParam int offset) {
+        return goodService.mApiList(user, cates, key, position, distance, orderBy, offset, Config.LIMIT);
+    }
+
+    @PostMapping("mapi/shoplist")
+    public  List<UnionGoods> shopList(@RequestParam String uuid, @RequestParam int offset, @RequestParam int limit) {
+        UnionGoods good = new UnionGoods();
+        good.setShopUuid(uuid);
+        return goodService.selectPageInfo(good, offset, limit).getList();
+    }
+
     @ResponseBody
     @RequestMapping("mapi/only")
-    public UnionGoods only(@RequestParam String shop) {
-        return goodService.handleResult(goodService.selectOnlyByKey(shop));
+    public UnionGoods only(@RequestParam String good) {
+        return goodService.handleResult(goodService.selectOnlyByKey(good));
     }
 
 //    @ResponseBody

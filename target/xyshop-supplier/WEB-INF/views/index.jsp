@@ -11,11 +11,16 @@
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <meta name="renderer" content="webkit">
             <meta http-equiv="Cache-Control" content="no-siteapp" />
-            <title>XXXX-商家:${shopName}</title>
+            <title>${shopName}</title>
             <!--[if lt IE 9]>
 <meta http-equiv="refresh" content="0;ie.html" />
 <![endif]-->
             <jsp:include page="head/baseHead.jsp"></jsp:include>
+            <style>
+                li.shopMenus {
+                    display: none;
+                }
+            </style>
         </head>
 
         <body class="fixed-sidebar full-height-layout gray-bg" style="overflow:hidden">
@@ -43,22 +48,23 @@
                                         </li>
                                     </ul>
                                 </div>
-                                <div class="logo-element">汇
+                                <div class="logo-element">畅
                                 </div>
                             </li>
-                            <li>
+                            <li class="shopMenus">
                                 <a class="J_menuItem" href="shop/home.html"><i class="fa fa-home"></i><span class="nav-label">首页</span></a>
                             </li>
-                            <li>
-                                <a><i class="fa fa-envelope"></i> <span class="nav-label">商家管理 </span></a>
+                            <li class="shopMenus">
+                                <a><i class="fa fa-envelope"></i> <span class="nav-label">商家管理 </span><span class="fa arrow"></span></a>
                                 <ul class="nav nav-second-level">
-                                    <li><a class="J_menuItem" href="shop/goodspage.html">商品管理</a></li>
-                                    <li><a class="J_menuItem" href="shop/orderpage.html">订单管理</a></li>
-                                    <li><a class="J_menuItem" href="shop/setting.html">店铺设置</a></li>
+                                    <li><a class="J_menuItem" href="goodspage.html">商品管理</a></li>
+                                    <li><a class="J_menuItem" href="orderpage.html">订单管理</a></li>
+                                    <li><a class="J_menuItem" href="setting.html">店铺设置</a></li>
+                                    <li><a class="J_menuItem" href="coupon.html">优惠卷管理</a></li>
                                 </ul>
                             </li>
-                            <li>
-                                <a><i class="fa fa-envelope"></i> <span class="nav-label">分销报表</span></a>
+                            <li class="shopMenus">
+                                <a><i class="fa fa-envelope"></i> <span class="nav-label">分销报表</span><span class="fa arrow"></span></a>
                                 <ul class="nav nav-second-level">
                                     <li><a class="J_menuItem" href="buyreport.html">产品销售量报表</a></li>
                                     <li><a class="J_menuItem" href="buyprofitreport.html">产品销售额报表</a></li>
@@ -66,24 +72,21 @@
                                     <li><a class="J_menuItem" href="buyprofitmonthreport.html">产品销售量月报表</a></li>
                                 </ul>
                             </li>
-                            <li>
+                            <li class="shopMenus">
                                 <a class="J_menuItem" href="buyer.html"><i class="fa fa-credit-card"></i> <span class="nav-label">会员管理</span></a>
                             </li>
-                            <li>
+                            <%--<li class="shopMenus">
                                 <a class="J_menuItem" href="comment.html"><i class="fa fa-credit-card"></i> <span class="nav-label">评论管理</span></a>
-                            </li>
+                            </li>--%>
 
                             <li></li>
                             <li></li>
                             <li></li>
-                            <li class="nav-header" style="padding: 15px;">
+                            <li class="nav-header contactUsLi" style="padding: 15px; display: none;">
                                 <div class="dropdown profile-element">
                                     <a data-toggle="dropdown" class="dropdown-toggle" href="#">
-                                <span class="clear">
-                                    <span class="block m-t-xs" style="margin-bottom: 15px;"><strong class="font-bold">官方联系方式</strong></span>
-                                    <p>联系电话：<span id="lx_phone">--</span></p>
-                                    <p>客户热线：<span id="lx_hottel">--</span></p>
-                                    <p>邮箱：<span id="lx-email">--</span></p>
+                                <span class="clear contactUs">
+                                    
                                 </span>
                             </a>
                                 </div>

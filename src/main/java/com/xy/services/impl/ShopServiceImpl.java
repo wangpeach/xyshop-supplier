@@ -3,6 +3,7 @@ package com.xy.services.impl;
 import com.github.pagehelper.PageInfo;
 import com.xy.config.Config;
 import com.xy.config.ResourcesConfig;
+import com.xy.mapper.ShopMapper;
 import com.xy.models.SearchRecord;
 import com.xy.models.Shop;
 import com.xy.models.ShopWallet;
@@ -24,9 +25,7 @@ import tk.mybatis.mapper.util.StringUtil;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  *
@@ -51,6 +50,9 @@ public class ShopServiceImpl extends BaseServiceImpl<Shop> implements ShopServic
 
     @Autowired
     private SearchRecrodService searchRecrodService;
+
+    @Autowired
+    private ShopMapper shopMapper;
 
 
     @Override
@@ -118,46 +120,46 @@ public class ShopServiceImpl extends BaseServiceImpl<Shop> implements ShopServic
     public List<Shop> mApiList(String user, String cats, String key, String position, String distance, String orderBy, int offset, int limit) {
         // 计算距离
         String[] latlng = position.split(",");
-        StringBuilder sbr = new StringBuilder();
-        sbr.append(" 2 * ASIN(");
-        sbr.append("     SQRT(");
-        sbr.append("        POWER(");
-        sbr.append("            SIN(");
-        sbr.append("                (latitude - " + latlng[1] + ") * 3.14159265359 / 180 / 2");
-        sbr.append("            ),");
-        sbr.append("            2");
-        sbr.append("         ) + COS(latitude * 3.14159265359 / 180) * COS(" + latlng[1] + " * 3.14159265359 / 180) * POWER(");
-        sbr.append("            SIN(");
-        sbr.append("                (longitude - " + latlng[0] + ") * 3.14159265359 / 180 / 2");
-        sbr.append("            ),");
-        sbr.append("            2");
-        sbr.append("        )");
-        sbr.append("    )");
-        sbr.append(" ) * 6378.137 * 1000");
-
-        Condition cond = new Condition(Shop.class);
-        Example.Criteria cri = cond.createCriteria();
-        cri.andEqualTo("status", "online");
-        if (StringUtils.isNotNull(cats)) {
-            if (cats.contains(",")) {
-                Iterable<String> catIds = Arrays.asList(StringUtils.strToArray(cats, ","));
-                cri.andIn("shopCatId", catIds);
-            } else {
-                cri.andEqualTo("shopCatId", cats);
-            }
-        }
+//        StringBuilder sbr = new StringBuilder();
+//        sbr.append(" 2 * ASIN(");
+//        sbr.append("     SQRT(");
+//        sbr.append("        POWER(");
+//        sbr.append("            SIN(");
+//        sbr.append("                (latitude - " + latlng[1] + ") * 3.14159265359 / 180 / 2");
+//        sbr.append("            ),");
+//        sbr.append("            2");
+//        sbr.append("         ) + COS(latitude * 3.14159265359 / 180) * COS(" + latlng[1] + " * 3.14159265359 / 180) * POWER(");
+//        sbr.append("            SIN(");
+//        sbr.append("                (longitude - " + latlng[0] + ") * 3.14159265359 / 180 / 2");
+//        sbr.append("            ),");
+//        sbr.append("            2");
+//        sbr.append("        )");
+//        sbr.append("    )");
+//        sbr.append(" ) * 6378.137 * 1000");
+//
+//        Condition cond = new Condition(Shop.class);
+//        Example.Criteria cri = cond.createCriteria();
+//        cri.andEqualTo("status", "online");
+//        if (StringUtils.isNotNull(cats)) {
+//            if (cats.contains(",")) {
+//                Iterable<String> catIds = Arrays.asList(StringUtils.strToArray(cats, ","));
+//                cri.andIn("shopCatId", catIds);
+//            } else {
+//                cri.andEqualTo("shopCatId", cats);
+//            }
+//        }
 
         // 关键字搜索
         if (StringUtils.isNotNull(key)) {
-            String[] cols = {"name", "shopCatName"};
-            String condition = " %s like ", arg = "'%" + key + "%'";
-
-            for (int i = 0; i < cols.length; i++) {
-                cols[i] = String.format(condition, StringUtil.camelhumpToUnderline(cols[i])) + arg;
-            }
-
-            String or = org.apache.commons.lang3.StringUtils.join(cols, " or ");
-            cri.andCondition("(" + or + ")");
+//            String[] cols = {"name", "shopCatName"};
+//            String condition = " %s like ", arg = "'%" + key + "%'";
+//
+//            for (int i = 0; i < cols.length; i++) {
+//                cols[i] = String.format(condition, StringUtil.camelhumpToUnderline(cols[i])) + arg;
+//            }
+//
+//            String or = org.apache.commons.lang3.StringUtils.join(cols, " or ");
+//            cri.andCondition("(" + or + ")");
 
             // 添加用户搜索记录
             SearchRecord record = new SearchRecord();
@@ -173,20 +175,38 @@ public class ShopServiceImpl extends BaseServiceImpl<Shop> implements ShopServic
         }
 
         // 限制搜索距离
-        if (StringUtils.isNotNull(distance)) {
-            cri.andCondition("(" + sbr.toString() + ") <= " + distance);
-        }
-        // 按条件排序
-        if (StringUtils.isNotNull(orderBy)) {
-            if ("0".equals(orderBy)) {
-                // 按距离从进到远排序
-                cond.setOrderByClause(sbr.toString());
-            } else {
-                // 人气/购买量 排序
-                cond.setOrderByClause(" total_sale_num desc");
-            }
-        }
-        return this.handleResult(super.selectPageInfoByCondition(cond, offset, limit).getList(), position);
+//        if (StringUtils.isNotNull(distance)) {
+//            cri.andCondition("(" + sbr.toString() + ") <= " + distance);
+//        }
+//        // 按条件排序
+//        if (StringUtils.isNotNull(orderBy)) {
+//            if ("0".equals(orderBy)) {
+//                // 按距离从进到远排序
+//                cond.setOrderByClause(sbr.toString());
+//            } else {
+//                // 人气/购买量 排序
+//                cond.setOrderByClause(" total_sale_num desc");
+//            }
+//        }
+        Map<String, Object> args = new HashMap<>();
+        args.put("name", key);
+        args.put("shopCatId", cats);
+        args.put("distance", distance);
+        args.put("lat", latlng[1]);
+        args.put("log", latlng[0]);
+        args.put("orderBy", orderBy);
+        args.put("offset", offset-1);
+        args.put("limit", limit);
+//        if (StringUtils.isNotNull(cats)) {
+//            if (cats.contains(",")) {
+//                Iterable<String> catIds = Arrays.asList(StringUtils.strToArray(cats, ","));
+//                args.put("shopCatId", );
+//            }
+//        }
+
+        List<Shop> shops = shopMapper.searchShopDetails(args);
+//        super.selectPageInfoByCondition(cond, offset, limit).getList()
+        return this.handleResult(shops, position);
     }
 
 
@@ -195,8 +215,6 @@ public class ShopServiceImpl extends BaseServiceImpl<Shop> implements ShopServic
     public int del(Shop shop) {
         return super.updateByPrimaryKeySelective(shop);
     }
-
-
 
 
     @Override

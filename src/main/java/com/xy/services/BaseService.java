@@ -47,11 +47,11 @@ public interface BaseService<T> {
 
     List<T> selectList(T entity);
 
-    PageInfo<T> selectPageInfo(T entity, int limit, int offset);
+    PageInfo<T> selectPageInfo(T entity, int offset, int limit);
 
     List<T> selectListByCondition(Condition condition);
 
-    PageInfo<T> selectPageInfoByCondition(Condition condition, int limit, int offset);
+    PageInfo<T> selectPageInfoByCondition(Condition condition, int offset, int limit);
 
     List<T> selectListByParams(ParamsPojo pj);
 
@@ -59,5 +59,6 @@ public interface BaseService<T> {
 
 
     public List<T> handleResult(List<T> args);
+
     public T handleResult(T arg);
 }

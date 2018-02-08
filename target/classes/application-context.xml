@@ -29,8 +29,6 @@
     </bean>
 
 
-
-
     <context:component-scan base-package="com.xy.*">
         <context:exclude-filter type="regex" expression="com.xy.controller" ></context:exclude-filter>
     </context:component-scan>
@@ -83,6 +81,8 @@
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <property name="configLocation" value="classpath:mybatis-config.xml"></property>
+        <property name="mapperLocations" value="classpath*:mapper/*.xml" />
+        <property name="typeAliasesPackage" value="com.xy.models"></property>
         <property name="plugins">
             <array>
                 <bean class="com.github.pagehelper.PageInterceptor">
@@ -109,6 +109,7 @@
 
     <bean class="tk.mybatis.spring.mapper.MapperScannerConfigurer">
         <property name="basePackage" value="com.xy.mapper"/>
+        <property name="sqlSessionTemplateBeanName" value="sqlSession" />
     </bean>
 
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
@@ -127,9 +128,14 @@
             <tx:method name="add*" propagation="REQUIRED" />
             <tx:method name="update*" propagation="REQUIRED" />
             <tx:method name="modify*" propagation="REQUIRED" />
+            <tx:method name="*Payment" propagation="REQUIRED" />
+            <tx:method name="*Notify" propagation="REQUIRED" />
             <tx:method name="remove*" propagation="REQUIRED" />
             <tx:method name="del*" propagation="REQUIRED" />
             <tx:method name="re*" propagation="REQUIRED" />
+            <tx:method name="mApi*" propagation="REQUIRED" />
+            <!--通用-->
+            <tx:method name="com*" propagation="REQUIRED" />
             <tx:method name="*" propagation="REQUIRED" read-only="true" />
         </tx:attributes>
     </tx:advice>
